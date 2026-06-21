@@ -128,13 +128,21 @@ export async function POST(request: Request) {
       pin,
     };
 
-    // Google Sheets
+    // Google Sheets — handle 302 redirect manually to keep POST method
     if (process.env.GOOGLE_SHEETS_WEBHOOK_URL) {
-      await fetch(process.env.GOOGLE_SHEETS_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(booking),
-      }).catch(err => console.error("Sheets error:", err));
+      try {
+        const sheetsBody = JSON.stringify(booking);
+        const sheetsHeaders = { "Content-Type": "application/json" };
+        const r1 = await fetch(process.env.GOOGLE_SHEETS_WEBHOOK_URL, {
+          method: "POST", headers: sheetsHeaders, body: sheetsBody, redirect: "manual",
+        });
+        const target = r1.status === 302 ? r1.headers.get("location") : null;
+        await fetch(target ?? process.env.GOOGLE_SHEETS_WEBHOOK_URL, {
+          method: "POST", headers: sheetsHeaders, body: sheetsBody,
+        });
+      } catch (err) {
+        console.error("Sheets error:", err);
+      }
     }
 
     // Email di conferma
