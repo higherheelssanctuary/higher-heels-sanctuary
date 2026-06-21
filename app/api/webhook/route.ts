@@ -1,8 +1,19 @@
 import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import crypto from "crypto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+function getPinForHour(date: string, time: string): string {
+  const hour = time.split(":")[0].padStart(2, "0");
+  const input = `${date}-${hour}`;
+  const hmac = crypto.createHmac("sha256", process.env.PIN_SECRET ?? "fallback");
+  hmac.update(input);
+  const hex = hmac.digest("hex");
+  const pin = (parseInt(hex.substring(0, 8), 16) % 9000) + 1000;
+  return pin.toString();
+}
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -29,6 +40,8 @@ export async function POST(request: Request) {
   if (event.type === "payment_intent.succeeded") {
     const intent = event.data.object as Stripe.PaymentIntent;
 
+    const pin = getPinForHour(intent.metadata.date, intent.metadata.time);
+
     const booking = {
       id: intent.id,
       room: intent.metadata.room,
@@ -39,6 +52,7 @@ export async function POST(request: Request) {
       currency: intent.currency.toUpperCase(),
       customer_email: intent.receipt_email ?? "",
       confirmed_at: new Date().toISOString(),
+      pin,
     };
 
     console.log("✅ Prenotazione confermata:", booking);
