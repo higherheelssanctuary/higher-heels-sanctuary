@@ -5,12 +5,12 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 function getPinForHour(date: string, time: string): string {
   const hour = time.split(":")[0].padStart(2, "0");
   const input = `${date}-${hour}`;
-  const hmac = crypto.createHmac("sha256", process.env.PIN_SECRET ?? "fallback");
+  const secret = Buffer.from((process.env.PIN_SECRET ?? "fallback").trim().replace(/^﻿/, ""), "utf8");
+  const hmac = crypto.createHmac("sha256", secret);
   hmac.update(input);
   const hex = hmac.digest("hex");
   const pin = (parseInt(hex.substring(0, 8), 16) % 9000) + 1000;
@@ -139,6 +139,7 @@ export async function POST(request: Request) {
 
     // Email di conferma
     if (booking.customer_email && process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY.trim());
       await resend.emails.send({
         from: "Higher Heels Sanctuary <prenotazioni@higherheels.es>",
         to: booking.customer_email,
