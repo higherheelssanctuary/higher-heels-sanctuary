@@ -40,6 +40,17 @@ const rooms = [
     features: ["Luna retroiluminada", "Barra aérea", "Atmósfera nocturna", "Tonos fríos suaves"],
     pricePerHour: 25,
   },
+  {
+    id: "test",
+    title: "🧪 Sala Test",
+    badge: "SOLO PARA PRUEBAS · NO USAR",
+    description: "Sala de prueba para verificar el sistema de pagos, email y PIN.",
+    accent: "#22c55e",
+    bg: "radial-gradient(ellipse at 50% 40%, rgba(34,197,94,0.1) 0%, #0a0a0a 65%), #0a0a0a",
+    textLight: true,
+    features: ["Pago €0.50", "Email con PIN", "Google Sheets", "Webhook test"],
+    pricePerHour: 0.5,
+  },
 ];
 
 // ─── Time slots ────────────────────────────────────────────────────────────────
