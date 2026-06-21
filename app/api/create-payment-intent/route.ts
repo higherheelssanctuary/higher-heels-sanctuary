@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const { amount, room, date, time, duration } = await request.json();
 
-    if (!amount || amount < 1) {
+    if (!amount || amount < 0.5) {
       return NextResponse.json({ error: "Importe inválido" }, { status: 400 });
     }
 
