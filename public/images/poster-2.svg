@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 711" width="400" height="711">
+  <defs>
+    <radialGradient id="g2" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f0eeeb"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="711" fill="url(#g2)"/>
+  <line x1="200" y1="40" x2="200" y2="680" stroke="#cccccc" stroke-width="5" opacity="0.5"/>
+  <rect x="30" y="300" width="60" height="90" rx="4" fill="none" stroke="#8B0000" stroke-width="2" opacity="0.4"/>
+  <text x="200" y="360" text-anchor="middle" fill="#8B0000" font-size="20" font-family="Georgia, serif" opacity="0.6">CLEAN &amp; SOFT</text>
+</svg>

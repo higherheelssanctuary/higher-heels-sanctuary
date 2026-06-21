@@ -1,0 +1,78 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 200 200"
+  width="200"
+  height="200"
+  fill="none"
+>
+  <defs>
+    <filter id="neonGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="neonGlowStrong" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer diamond -->
+  <polygon
+    id="diamond-outer"
+    points="100,10 190,100 100,190 10,100"
+    stroke="#FF0033"
+    stroke-width="3"
+    fill="none"
+    filter="url(#neonGlowStrong)"
+  />
+
+  <!-- Inner diamond -->
+  <polygon
+    id="diamond-inner"
+    points="100,35 165,100 100,165 35,100"
+    stroke="#FF0033"
+    stroke-width="1.5"
+    fill="none"
+    filter="url(#neonGlow)"
+    opacity="0.55"
+  />
+
+  <!-- Central pole line -->
+  <line
+    id="pole-line"
+    x1="100" y1="35"
+    x2="100" y2="165"
+    stroke="#FF0033"
+    stroke-width="2.5"
+    filter="url(#neonGlow)"
+    opacity="0.85"
+  />
+
+  <!-- Dancer silhouette (abstract) -->
+  <g id="dancer" filter="url(#neonGlow)" opacity="0.9">
+    <!-- Head -->
+    <circle cx="100" cy="72" r="7" fill="#FF0033"/>
+    <!-- Body -->
+    <line x1="100" y1="79" x2="100" y2="110" stroke="#FF0033" stroke-width="3"/>
+    <!-- Arm extended upward toward pole -->
+    <line x1="100" y1="85" x2="116" y2="72" stroke="#FF0033" stroke-width="2.5"/>
+    <!-- Arm holding pole -->
+    <line x1="100" y1="85" x2="100" y2="72" stroke="#FF0033" stroke-width="2"/>
+    <!-- Leg kick -->
+    <line x1="100" y1="110" x2="120" y2="128" stroke="#FF0033" stroke-width="2.5"/>
+    <!-- Grounded leg -->
+    <line x1="100" y1="110" x2="90" y2="130" stroke="#FF0033" stroke-width="2"/>
+  </g>
+
+  <!-- Stiletto heel marks -->
+  <g id="heels" filter="url(#neonGlow)" opacity="0.75">
+    <line x1="120" y1="128" x2="128" y2="136" stroke="#FF0033" stroke-width="2"/>
+    <line x1="128" y1="136" x2="123" y2="140" stroke="#FF0033" stroke-width="1.8"/>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 711" width="400" height="711">
+  <defs>
+    <radialGradient id="g3" cx="50%" cy="25%" r="50%">
+      <stop offset="0%" stop-color="#151830"/>
+      <stop offset="100%" stop-color="#080B14"/>
+    </radialGradient>
+    <radialGradient id="moon" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E8EAF6"/>
+      <stop offset="100%" stop-color="#7986CB"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="711" fill="url(#g3)"/>
+  <circle cx="300" cy="100" r="55" fill="url(#moon)" opacity="0.85"
+    style="filter:drop-shadow(0 0 20px rgba(140,160,255,0.7))"/>
+  <circle cx="285" cy="92" r="8" fill="#B3B8D4" opacity="0.4"/>
+  <circle cx="310" cy="78" r="5" fill="#B3B8D4" opacity="0.35"/>
+  <line x1="200" y1="40" x2="200" y2="680" stroke="#8CA0FF" stroke-width="4" opacity="0.4"/>
+  <text x="200" y="380" text-anchor="middle" fill="#8CA0FF" font-size="20" font-family="Georgia, serif" opacity="0.6">MOONLIGHT</text>
+</svg>
