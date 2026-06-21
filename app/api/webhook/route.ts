@@ -43,9 +43,13 @@ export async function POST(request: Request) {
 
     console.log("✅ Prenotazione confermata:", booking);
 
-    // TODO: scrivere su Google Sheets
-    // TODO: inviare email di conferma
-    // TODO: generare PIN TTLock
+    if (process.env.GOOGLE_SHEETS_WEBHOOK_URL) {
+      await fetch(process.env.GOOGLE_SHEETS_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(booking),
+      }).catch(err => console.error("Sheets error:", err));
+    }
   }
 
   return NextResponse.json({ received: true });
