@@ -7,25 +7,6 @@ import Link from "next/link";
 
 const EASE: Easing = "easeOut";
 
-function Logo({ visible }: { visible: boolean }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.85 }}
-      animate={visible ? { opacity: 1, scale: 1 } : {}}
-      transition={{ delay: 0.2, duration: 0.8, ease: EASE }}
-      className="relative flex items-center justify-center w-40 h-40 md:w-56 md:h-56"
-      aria-hidden="true"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/logo.jpg"
-        alt=""
-        className="w-full h-full object-contain"
-        style={{ mixBlendMode: "screen" }}
-      />
-    </motion.div>
-  );
-}
 
 export default function Hero() {
   const [loaded, setLoaded] = useState(false);
@@ -110,22 +91,15 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-5 md:px-8 max-w-2xl mx-auto w-full">
-        {/* Logo mark */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={loaded ? { opacity: 1, scale: 1 } : {}}
-          transition={{ delay: 0.15, duration: 0.6, ease: EASE }}
-        >
-          <Logo visible={loaded} />
-        </motion.div>
-
         {/* Wordmark */}
         <motion.h1
-          {...fadeDelay(1000)}
-          className="mt-4 animate-flicker text-shadow-neon text-[#FF1E3C] leading-none"
+          {...fadeDelay(400)}
+          className="animate-flicker text-[#FF1E3C] leading-none"
           style={{
-            fontFamily: "var(--font-great-vibes)",
-            fontSize: "clamp(2.8rem, 10vw, 6rem)",
+            fontFamily: "var(--font-dancing-script)",
+            fontSize: "clamp(4rem, 14vw, 9rem)",
+            textShadow:
+              "0 0 8px #fff, 0 0 16px #fff, 0 0 32px #FF1E3C, 0 0 64px #FF1E3C, 0 0 120px rgba(255,30,60,0.5)",
           }}
         >
           Higher Heels
@@ -133,9 +107,14 @@ export default function Hero() {
 
         {/* Sanctuary */}
         <motion.p
-          {...fadeDelay(1800)}
-          className="mt-2 text-[#F5F5F5] tracking-[0.3em] text-sm md:text-xl"
-          style={{ fontFamily: "var(--font-bebas-neue)" }}
+          {...fadeDelay(1000)}
+          className="mt-1 tracking-[0.4em] text-sm md:text-base"
+          style={{
+            fontFamily: "var(--font-bebas-neue)",
+            color: "#FF1E3C",
+            textShadow: "0 0 12px rgba(255,30,60,0.6)",
+            letterSpacing: "0.45em",
+          }}
         >
           SANCTUARY
         </motion.p>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Bebas_Neue, Great_Vibes } from "next/font/google";
+import { Inter, Bebas_Neue, Great_Vibes, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -23,6 +23,14 @@ const greatVibes = Great_Vibes({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-great-vibes",
+  display: "swap",
+  preload: true,
+});
+
+const dancingScript = Dancing_Script({
+  weight: "700",
+  subsets: ["latin"],
+  variable: "--font-dancing-script",
   display: "swap",
   preload: true,
 });
@@ -71,7 +79,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${bebasNeue.variable} ${greatVibes.variable}`}
+      className={`${inter.variable} ${bebasNeue.variable} ${greatVibes.variable} ${dancingScript.variable}`}
     >
       <body className="bg-[#0A0A0A] text-[#F5F5F5] antialiased overflow-x-hidden">
         <a href="#main-content" className="skip-link">
