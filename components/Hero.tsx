@@ -106,10 +106,10 @@ export default function Hero() {
         {/* Sanctuary */}
         <motion.p
           {...fadeDelay(1800)}
-          className="mt-2 text-[#F5F5F5] tracking-[0.3em] text-sm md:text-xl"
+          className="mt-2 tracking-[0.3em] text-sm md:text-xl animate-flicker text-shadow-neon text-[#FF1E3C]"
           style={{ fontFamily: "var(--font-bebas-neue)" }}
         >
-          SANCTUARY
+          SANC†UARY
         </motion.p>
 
         {/* Subheadline */}
