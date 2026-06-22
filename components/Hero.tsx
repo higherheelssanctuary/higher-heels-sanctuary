@@ -93,13 +93,11 @@ export default function Hero() {
       <div className="relative z-10 flex flex-col items-center text-center px-5 md:px-8 max-w-2xl mx-auto w-full">
         {/* Wordmark */}
         <motion.h1
-          {...fadeDelay(400)}
-          className="animate-flicker text-[#FF1E3C] leading-none"
+          {...fadeDelay(1000)}
+          className="mt-4 animate-flicker text-shadow-neon text-[#FF1E3C] leading-none"
           style={{
-            fontFamily: "var(--font-dancing-script)",
-            fontSize: "clamp(4rem, 14vw, 9rem)",
-            textShadow:
-              "0 0 8px #fff, 0 0 16px #fff, 0 0 32px #FF1E3C, 0 0 64px #FF1E3C, 0 0 120px rgba(255,30,60,0.5)",
+            fontFamily: "var(--font-great-vibes)",
+            fontSize: "clamp(2.8rem, 10vw, 6rem)",
           }}
         >
           Higher Heels
@@ -107,14 +105,9 @@ export default function Hero() {
 
         {/* Sanctuary */}
         <motion.p
-          {...fadeDelay(1000)}
-          className="mt-1 tracking-[0.4em] text-sm md:text-base"
-          style={{
-            fontFamily: "var(--font-bebas-neue)",
-            color: "#FF1E3C",
-            textShadow: "0 0 12px rgba(255,30,60,0.6)",
-            letterSpacing: "0.45em",
-          }}
+          {...fadeDelay(1800)}
+          className="mt-2 text-[#F5F5F5] tracking-[0.3em] text-sm md:text-xl"
+          style={{ fontFamily: "var(--font-bebas-neue)" }}
         >
           SANCTUARY
         </motion.p>
