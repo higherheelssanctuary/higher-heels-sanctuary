@@ -35,7 +35,7 @@ export default function Hero() {
         <div
           className="absolute h-full"
           style={{
-            width: "18px",
+            width: "28px",
             background: "radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 70%)",
           }}
         />
@@ -43,7 +43,7 @@ export default function Hero() {
         <div
           className="relative h-full"
           style={{
-            width: "9px",
+            width: "14px",
             background:
               "linear-gradient(to right, #080808 0%, #1a1a1a 10%, #444 28%, #c8c8c8 46%, #ffffff 52%, #c8c8c8 58%, #444 72%, #1a1a1a 90%, #080808 100%)",
             backgroundSize: "200% 100%",
