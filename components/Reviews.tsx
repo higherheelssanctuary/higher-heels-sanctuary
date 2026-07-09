@@ -10,7 +10,7 @@ const reviews = [
     subtitle: "Bailarina · Cliente desde 2024",
   },
   {
-    text: "Reservé la Moonlight Room para grabar contenido y salí con material para tres meses. Cada rincón está pensado para la cámara.",
+    text: "Reservé la sala Ares para grabar contenido y salí con material para tres meses. Cada rincón está pensado para la cámara.",
     name: "Andrea V.",
     subtitle: "Creadora de contenido",
   },
@@ -25,7 +25,7 @@ const reviews = [
     subtitle: "Instructora de pole",
   },
   {
-    text: "Vengo dos veces por semana y nunca me canso. Cada sala tiene su propia personalidad. La Dark Sensual es mi favorita.",
+    text: "Vengo dos veces por semana y nunca me canso. Cada sala tiene su propia personalidad. La Sensual es mi favorita.",
     name: "Sofía L.",
     subtitle: "Bailarina",
   },
@@ -81,7 +81,7 @@ export default function Reviews() {
           {reviews.map((review, i) => (
             <div
               key={i}
-              className="snap-center min-w-[85%] flex-shrink-0"
+              className="snap-center shrink-0 w-[82vw] max-w-[340px]"
               role="listitem"
             >
               <ReviewCard {...review} />

@@ -93,7 +93,7 @@ export default function Hero() {
       <div className="relative z-10 flex flex-col items-center text-center px-5 md:px-8 max-w-2xl mx-auto w-full">
         {/* Wordmark */}
         <motion.h1
-          {...fadeDelay(1000)}
+          {...fadeDelay(100)}
           className="mt-4 animate-flicker text-shadow-neon text-[#FF1E3C] leading-none"
           style={{
             fontFamily: "var(--font-great-vibes)",
@@ -105,7 +105,7 @@ export default function Hero() {
 
         {/* Sanctuary */}
         <motion.p
-          {...fadeDelay(1800)}
+          {...fadeDelay(250)}
           className="mt-2 tracking-[0.3em] text-sm md:text-xl animate-flicker text-shadow-neon text-[#FF1E3C]"
           style={{ fontFamily: "var(--font-bebas-neue)" }}
         >
@@ -114,7 +114,7 @@ export default function Hero() {
 
         {/* Subheadline */}
         <motion.p
-          {...fadeDelay(2200)}
+          {...fadeDelay(400)}
           className="mt-6 text-[#F5F5F5]/80 text-base md:text-lg max-w-md leading-relaxed"
         >
           El único santuario de pole dance privado en Madrid.
@@ -124,7 +124,7 @@ export default function Hero() {
 
         {/* CTA */}
         <motion.div
-          {...fadeDelay(2600)}
+          {...fadeDelay(550)}
           className="mt-8 w-full flex justify-center"
         >
           <Link
@@ -138,7 +138,7 @@ export default function Hero() {
 
         {/* Scroll indicator */}
         <motion.div
-          {...fadeDelay(2800)}
+          {...fadeDelay(700)}
           className="mt-12 flex flex-col items-center gap-1 text-[#F5F5F5]/40"
           aria-hidden="true"
         >

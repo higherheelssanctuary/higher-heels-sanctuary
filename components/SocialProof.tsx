@@ -24,9 +24,9 @@ type Room = {
 const rooms: Room[] = [
   {
     id: "dark",
-    tab: "DARK SENSUAL",
-    title: "SALA DARK SENSUAL",
-    ctaName: "DARK SENSUAL",
+    tab: "SENSUAL",
+    title: "SALA SENSUAL",
+    ctaName: "SENSUAL",
     description:
       "Para las que entrenan de noche y crean sin límites. Círculo LED rojo en el suelo, proyector de atmósfera y luz escenográfica. La sala más cinematográfica de Madrid.",
     badge: "OSCURA · ÍNTIMA · CINEMATOGRÁFICA",
@@ -45,9 +45,9 @@ const rooms: Room[] = [
   },
   {
     id: "clean",
-    tab: "CLEAN & SOFT",
-    title: "SALA CLEAN & SOFT",
-    ctaName: "CLEAN & SOFT",
+    tab: "ÁUREA",
+    title: "SALA ÁUREA",
+    ctaName: "ÁUREA",
     description:
       "Espacio de luz limpia y enfoque total. Paredes blancas, iluminación clara y el legendario teléfono rojo de pared. Para las que quieren verse mejor en cada movimiento.",
     badge: "LUMINOSA · FUNCIONAL · ACCESIBLE",
@@ -57,7 +57,7 @@ const rooms: Room[] = [
       "Teléfono rojo iconic",
       "Doble espejo",
     ],
-    price: 20,
+    price: 25,
     accent: "#8B0000",
     envClass: "room-env-clean",
     image: "/images/rooms/clean-soft-portrait.png",
@@ -67,9 +67,9 @@ const rooms: Room[] = [
   },
   {
     id: "moon",
-    tab: "MOONLIGHT",
-    title: "SALA MOONLIGHT",
-    ctaName: "MOONLIGHT",
+    tab: "ARES",
+    title: "SALA ARES",
+    ctaName: "ARES",
     description:
       "Bajo la luna, cada barra es un escenario. Luna realista retroiluminada, barra aérea y luces de ambiente suave. Arte, fuerza y atmósfera en una sola sesión.",
     badge: "ARTÍSTICA · EMOCIONAL · ÚNICA",

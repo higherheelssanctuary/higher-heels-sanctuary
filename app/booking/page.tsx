@@ -9,7 +9,7 @@ import StripePaymentForm from "@/components/StripePaymentForm";
 const rooms = [
   {
     id: "dark",
-    title: "Sala Dark Sensual",
+    title: "Sala Sensual",
     badge: "OSCURA · ÍNTIMA · CINEMATOGRÁFICA",
     description: "Círculo LED rojo, proyector dinámico e iluminación escenográfica. La sala más cinematográfica.",
     accent: "#FF1E3C",
@@ -20,18 +20,18 @@ const rooms = [
   },
   {
     id: "clean",
-    title: "Sala Clean & Soft",
+    title: "Sala Áurea",
     badge: "LUMINOSA · FUNCIONAL · ACCESIBLE",
     description: "Paredes blancas, luz de entrenamiento clara y el legendario teléfono rojo de pared.",
     accent: "#8B0000",
     bg: "radial-gradient(ellipse at 50% 0%, rgba(255,230,230,0.6) 0%, #F0EEEB 60%)",
     textLight: false,
     features: ["Paredes blancas", "Luz de entrenamiento", "Teléfono rojo iconic", "Doble espejo"],
-    pricePerHour: 20,
+    pricePerHour: 25,
   },
   {
     id: "moon",
-    title: "Sala Moonlight",
+    title: "Sala Ares",
     badge: "ARTÍSTICA · EMOCIONAL · ÚNICA",
     description: "Luna retroiluminada, barra aérea y atmósfera nocturna. Arte, fuerza y magia en una sola sesión.",
     accent: "#8CA0FF",
