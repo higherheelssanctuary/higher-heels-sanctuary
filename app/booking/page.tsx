@@ -60,6 +60,21 @@ const timeSlots = [
   "20:00", "21:00", "22:00",
 ];
 
+// ─── Bonos & Membresías ─────────────────────────────────────────────────────────
+type PlanType = "single" | "bonos" | "membresias";
+
+const bonos = [
+  { id: "esencia", name: "Esencia", entradas: 5, price: 115, tag: "" },
+  { id: "ritual", name: "Ritual", entradas: 10, price: 210, tag: "POPULAR" },
+  { id: "elite", name: "Élite", entradas: 20, price: 400, tag: "" },
+];
+
+const membresias = [
+  { id: "plata", name: "Plata", entradas: 4, price: 90, tag: "" },
+  { id: "oro", name: "Oro", entradas: 8, price: 165, tag: "POPULAR" },
+  { id: "platino", name: "Platino", entradas: 15, price: 280, tag: "" },
+];
+
 // Simulate some booked slots (demo)
 const bookedSlots: Record<string, string[]> = {
   dark: ["10:00", "14:00", "18:00"],
@@ -147,6 +162,7 @@ export default function BookingPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [planType, setPlanType] = useState<PlanType>("single");
 
   const room = rooms.find(r => r.id === selectedRoom);
   const total = room ? room.pricePerHour * duration : 0;
@@ -193,8 +209,113 @@ export default function BookingPage() {
             <ChevronLeft size={16} /> Volver al inicio
           </Link>
 
-          <StepBar current="room" />
+          {planType === "single" && <StepBar current="room" />}
 
+          {/* Plan type selector */}
+          <div className="flex flex-wrap gap-2 mb-8">
+            {([
+              { id: "single", label: "RESERVA ÚNICA" },
+              { id: "bonos", label: "BONOS" },
+              { id: "membresias", label: "MEMBRESÍAS" },
+            ] as { id: PlanType; label: string }[]).map(t => {
+              const active = planType === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setPlanType(t.id)}
+                  className="px-5 h-11 rounded-full text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF1E3C]"
+                  style={{
+                    fontFamily: "var(--font-bebas-neue)",
+                    letterSpacing: "0.1em",
+                    background: active ? "#FF1E3C" : "rgba(255,255,255,0.05)",
+                    color: active ? "#fff" : "rgba(245,245,245,0.55)",
+                    boxShadow: active ? "0 0 24px rgba(255,30,60,0.4)" : "none",
+                    border: active ? "none" : "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Bonos & Membresías */}
+          {planType !== "single" && (
+            <div>
+              <h1 className="text-4xl md:text-5xl text-[#F5F5F5] mb-2" style={{ fontFamily: "var(--font-bebas-neue)" }}>
+                {planType === "bonos" ? "BONOS DE ENTRADAS" : "MEMBRESÍAS"}
+              </h1>
+              <p className="text-[#F5F5F5]/40 mb-10 text-sm">
+                {planType === "bonos"
+                  ? "Compra tus entradas por adelantado y ahorra. Un único código válido para todas tus sesiones · 6 meses de validez · cualquier sala."
+                  : "Entrena cada mes con tu plan. Pago mensual · las entradas se renuevan cada mes · cualquier sala."}
+              </p>
+              <div className="grid md:grid-cols-3 gap-5">
+                {(planType === "bonos" ? bonos : membresias).map(p => (
+                  <div
+                    key={p.id}
+                    className="relative rounded-2xl border p-6 flex flex-col"
+                    style={{
+                      borderColor: p.tag ? "#FF1E3C" : "rgba(255,255,255,0.08)",
+                      background: "#111111",
+                      boxShadow: p.tag ? "0 0 30px rgba(255,30,60,0.15)" : "none",
+                    }}
+                  >
+                    {p.tag && (
+                      <span
+                        className="absolute top-4 right-4 text-[10px] tracking-widest px-2 py-0.5 rounded-full"
+                        style={{ background: "#FF1E3C", color: "#fff", fontFamily: "var(--font-bebas-neue)" }}
+                      >
+                        {p.tag}
+                      </span>
+                    )}
+                    <h3 className="text-2xl" style={{ fontFamily: "var(--font-bebas-neue)", color: "#F5F5F5" }}>
+                      {p.name}
+                    </h3>
+                    <p
+                      className="text-sm text-[#FF1E3C] mb-5"
+                      style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}
+                    >
+                      {p.entradas} ENTRADAS{planType === "membresias" ? " / MES" : ""}
+                    </p>
+                    <div className="mb-2">
+                      <span className="text-4xl" style={{ fontFamily: "var(--font-bebas-neue)", color: "#F5F5F5" }}>
+                        {p.price}€
+                      </span>
+                      {planType === "membresias" && <span className="text-sm text-[#F5F5F5]/40"> /mes</span>}
+                    </div>
+                    <p className="text-xs text-[#F5F5F5]/40">
+                      {(p.price / p.entradas).toFixed(2).replace(".", ",")}€ por entrada
+                    </p>
+                    <p className="text-xs text-[#F5F5F5]/40 mb-6">
+                      {planType === "bonos" ? "Válido 6 meses" : "Se renueva cada mes"}
+                    </p>
+                    <div className="mt-auto">
+                      <button
+                        disabled
+                        className="w-full h-12 rounded-sm text-sm cursor-not-allowed"
+                        style={{
+                          fontFamily: "var(--font-bebas-neue)",
+                          letterSpacing: "0.12em",
+                          background: "rgba(255,255,255,0.06)",
+                          color: "rgba(245,245,245,0.4)",
+                        }}
+                      >
+                        MUY PRONTO
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-6 text-xs text-[#F5F5F5]/30 max-w-xl">
+                Al comprar recibirás un código único por email, válido para reservar todas tus entradas con el mismo código. La compra online estará disponible muy pronto.
+              </p>
+            </div>
+          )}
+
+          {/* Single booking */}
+          {planType === "single" && (
+          <div>
           <h1 className="text-4xl md:text-5xl text-[#F5F5F5] mb-2" style={{ fontFamily: "var(--font-bebas-neue)" }}>
             ELIGE TU SALA
           </h1>
@@ -278,6 +399,8 @@ export default function BookingPage() {
               CONTINUAR <ChevronRight size={16} />
             </button>
           </div>
+          </div>
+          )}
         </div>
       </div>
     );
