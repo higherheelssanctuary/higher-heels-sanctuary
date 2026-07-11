@@ -66,7 +66,8 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="#"
+                href="https://www.instagram.com/higherheels_sanctuary/"
+                target="_blank"
                 className="flex items-center justify-center w-11 h-11 text-[#666666] hover:text-[#FF1E3C] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF1E3C] rounded-sm"
                 aria-label="Instagram de Higher Heels Sanctuary"
                 rel="noopener noreferrer"
