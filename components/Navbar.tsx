@@ -8,6 +8,7 @@ import MobileMenu from "./MobileMenu";
 const navLinks = [
   { href: "/#salas", label: "Salas" },
   { href: "/#nosotros", label: "Nosotros" },
+  { href: "/#foto-video", label: "Foto & Vídeo" },
   { href: "/#reseñas", label: "Reseñas" },
   { href: "/login", label: "Iniciar Sesión" },
 ];

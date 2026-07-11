@@ -9,6 +9,7 @@ const navLinks = [
   { href: "/", label: "Inicio" },
   { href: "/#salas", label: "Salas" },
   { href: "/#nosotros", label: "Nosotros" },
+  { href: "/#foto-video", label: "Foto & Vídeo" },
   { href: "/#reseñas", label: "Reseñas" },
   { href: "/login", label: "Iniciar Sesión" },
 ];
