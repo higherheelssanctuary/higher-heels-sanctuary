@@ -2,6 +2,7 @@ import Hero from "@/components/Hero";
 import VideoShowcase from "@/components/VideoShowcase";
 import SocialProof from "@/components/SocialProof";
 import About from "@/components/About";
+import Videomaker from "@/components/Videomaker";
 import Reviews from "@/components/Reviews";
 import FinalCTA from "@/components/FinalCTA";
 
@@ -12,6 +13,7 @@ export default function Home() {
       <VideoShowcase />
       <SocialProof />
       <About />
+      <Videomaker />
       <Reviews />
       <FinalCTA />
     </>
