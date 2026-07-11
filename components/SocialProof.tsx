@@ -28,13 +28,13 @@ const rooms: Room[] = [
     title: "SALA SENSUAL",
     ctaName: "SENSUAL",
     description:
-      "Para las que entrenan de noche y crean sin límites. Círculo LED rojo en el suelo, proyector de atmósfera y luz escenográfica. La sala más cinematográfica de Madrid.",
+      "Aquí no vienes solo a entrenar. Vienes a sentir. Un refugio para conectar con tu sensualidad, explorarte y vivir el pole como nació: auténtico y sin miedo.",
     badge: "OSCURA · ÍNTIMA · CINEMATOGRÁFICA",
     features: [
-      "Círculo LED rojo en el suelo",
-      "Proyector dinámico",
+      "Círculo LED en el suelo",
+      "Insonorización",
       "Iluminación dual",
-      "Barras profesionales",
+      "Sala domotizada",
     ],
     price: 25,
     accent: "#FF1E3C",
@@ -49,13 +49,12 @@ const rooms: Room[] = [
     title: "SALA ÁUREA",
     ctaName: "ÁUREA",
     description:
-      "Espacio de luz limpia y enfoque total. Paredes blancas, iluminación clara y el legendario teléfono rojo de pared. Para las que quieren verse mejor en cada movimiento.",
+      "Una sala que cambia contigo. Juega con la luz y crea tu propia atmósfera. Aquí no hay un único escenario, sino infinitas posibilidades. Cada movimiento. Cada vídeo. Con tu áurea.",
     badge: "LUMINOSA · FUNCIONAL · ACCESIBLE",
     features: [
-      "Paredes blancas",
-      "Luz de entrenamiento",
-      "Teléfono rojo iconic",
-      "Doble espejo",
+      "Diseño LED exclusivo",
+      "Insonorización",
+      "Sala domotizada",
     ],
     price: 25,
     accent: "#8B0000",
@@ -71,13 +70,14 @@ const rooms: Room[] = [
     title: "SALA ARES",
     ctaName: "ARES",
     description:
-      "Bajo la luna, cada barra es un escenario. Luna realista retroiluminada, barra aérea y luces de ambiente suave. Arte, fuerza y atmósfera en una sola sesión.",
+      "Un espacio para desafiar la gravedad. Explora distintas disciplinas aéreas, descubre nuevas sensaciones y rompe tus propios límites.",
     badge: "ARTÍSTICA · EMOCIONAL · ÚNICA",
     features: [
-      "Luna retroiluminada",
-      "Barra aérea",
-      "Atmósfera nocturna",
-      "Tonos fríos suaves",
+      "Escultura LED de Marte",
+      "Iluminación dual",
+      "Pole aéreo / telas / aro",
+      "Insonorización",
+      "Sala domotizada",
     ],
     price: 25,
     accent: "#8CA0FF",
@@ -313,30 +313,12 @@ export default function SocialProof() {
                     ))}
                   </ul>
 
-                  {/* Price + CTA */}
-                  <div className="mt-6 flex items-center justify-between gap-4">
-                    <div className="leading-none">
-                      <span
-                        className="text-3xl md:text-4xl"
-                        style={{
-                          fontFamily: "var(--font-bebas-neue)",
-                          color: room.accent,
-                        }}
-                      >
-                        {room.price}€
-                      </span>
-                      <span
-                        className="ml-1 text-xs tracking-widest"
-                        style={{ color: textMuted }}
-                      >
-                        / HORA
-                      </span>
-                    </div>
-
+                  {/* CTA */}
+                  <div className="mt-6">
                     <NeonButton
                       href="/booking"
                       size="md"
-                      className={room.ctaClass}
+                      className={`w-full ${room.ctaClass}`}
                       ariaLabel={`Reservar sala ${room.ctaName}`}
                     >
                       RESERVAR {room.ctaName}

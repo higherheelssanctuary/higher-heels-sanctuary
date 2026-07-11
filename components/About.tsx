@@ -12,16 +12,18 @@ const fadeUp = (delay = 0) => ({
 });
 
 const paragraphs = [
-  "Higher Heels Sanctuary nace de una idea simple: las bailarinas merecen un espacio propio.",
-  "Somos el único lugar en Madrid donde puedes alquilar una sala completa para ti sola — o con quien tú elijas — y entrenar sin miradas, sin esperas, sin distracciones. Solo tú, la barra, y la libertad de crear contenido sin límites.",
-  "Tres salas. Tres atmósferas. Una sola obsesión: que cada sesión se sienta como una performance.",
-  "Abierto 24 horas, 7 días a la semana. En pleno centro de Madrid.",
+  "Higher Heels Sanctuary nace de una idea simple: crear el espacio que siempre habíamos querido para entrenar.",
+  "Aquí no alquilas una barra. Reservas un escenario completamente privado que puedes modificar a tu gusto.",
+  "Cada una de nuestras salas está insonorizada, es totalmente independiente y cuenta con un sistema domótico que te permite controlar desde una tablet la iluminación, la música y la climatización. Tú decides el ambiente. Nosotros ponemos el escenario.",
+  "Tres salas con identidades diferentes. Una misma filosofía: ofrecer un lugar donde entrenar, crear contenido y expresarte con total libertad.",
+  "24 horas al día. 7 días a la semana. Sin límites.",
 ];
 
 const historyParagraphs = [
-  "El pole dance hunde sus raíces en tradiciones milenarias. El Mallakhamb indio, practicado por guerreros hace más de 800 años, y el poste chino, disciplina circense de fuerza extrema, son sus antepasados directos.",
-  "A finales del siglo XX, el pole dance evolucionó hasta convertirse en una expresión artística completa: fuerza, flexibilidad, sensualidad y narrativa corporal en una sola disciplina.",
-  "Hoy es deporte, arte y reivindicación. En Higher Heels Sanctuary lo celebramos en todas sus formas — desde el entrenamiento técnico hasta la performance más íntima.",
+  "El pole dance es mucho más que un deporte o una disciplina artística. Es una forma de expresión con una historia que merece ser conocida y respetada.",
+  "Durante los años 80 y 90, especialmente en ciudades como Atlanta, Houston y Nueva Orleans, las bailarinas de striptease, y en particular las strippers negras, revolucionaron esta disciplina. Desarrollaron movimientos, transiciones, técnicas y una forma de interpretar el pole que hoy siguen siendo la base de muchos estilos que practicamos en estudios de todo el mundo.",
+  "Con el paso de los años, el pole dance salió de los clubes y se popularizó como deporte y actividad de fitness. Sin embargo, esa evolución vino acompañada de un intento de desvincularlo de sus orígenes para hacerlo más aceptado socialmente. En ese proceso, muchas de las mujeres que construyeron esta disciplina, especialmente las bailarinas negras, dejaron de recibir el reconocimiento que merecían.",
+  "En Higher Heels Sanctuary creemos que no se puede entender el pole dance sin reconocer de dónde viene. Honrar su historia no significa que todas las personas que practican pole tengan que compartir ese camino, sino entender que el arte que hoy disfrutamos existe gracias al talento, la creatividad y el trabajo de miles de strippers que transformaron una barra en un lenguaje artístico y sensual.",
 ];
 
 export default function About() {
@@ -111,8 +113,8 @@ export default function About() {
             className="text-4xl md:text-5xl text-[#F5F5F5] leading-tight"
             style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.02em" }}
           >
-            DE RITUAL
-            <br />A ARTE
+            LA HISTORIA
+            <br />DEL POLE DANCE
           </motion.h2>
 
           <motion.div
@@ -143,13 +145,13 @@ export default function About() {
             className="mt-10 flex flex-col gap-4"
           >
             {[
-              { year: "+800 años", label: "Raíces del Mallakhamb indio" },
-              { year: "Siglo XX", label: "Evolución como arte y disciplina" },
-              { year: "Hoy", label: "Deporte, arte y empoderamiento" },
+              { year: "Años 80-90", label: "El nacimiento del pole moderno" },
+              { year: "Evolución", label: "Del strip club al estudio" },
+              { year: "Legado", label: "Arte, historia y respeto" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-4">
                 <span
-                  className="text-[#FF1E3C] text-sm w-20 flex-shrink-0"
+                  className="text-[#FF1E3C] text-sm w-28 flex-shrink-0"
                   style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.04em" }}
                 >
                   {item.year}
