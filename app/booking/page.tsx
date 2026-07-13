@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Check, Clock, Calendar, CreditCard, Lock } from "lucide-react";
 import StripePaymentForm from "@/components/StripePaymentForm";
@@ -74,13 +74,6 @@ const membresias = [
   { id: "oro", name: "Oro", entradas: 8, price: 165, tag: "POPULAR" },
   { id: "platino", name: "Platino", entradas: 15, price: 280, tag: "" },
 ];
-
-// Simulate some booked slots (demo)
-const bookedSlots: Record<string, string[]> = {
-  dark: ["10:00", "14:00", "18:00"],
-  clean: ["09:00", "13:00", "19:00"],
-  moon: ["11:00", "17:00", "21:00"],
-};
 
 // ─── Date helpers ──────────────────────────────────────────────────────────────
 function getDays(month: number, year: number) {
@@ -163,6 +156,22 @@ export default function BookingPage() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [planType, setPlanType] = useState<PlanType>("single");
+  const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
+
+  // Fetch real availability from the DB whenever room + date change
+  useEffect(() => {
+    if (!selectedRoom || !selectedDate) {
+      setOccupiedSlots([]);
+      return;
+    }
+    const dateStr = `${selectedDate.year}-${String(selectedDate.month + 1).padStart(2, "0")}-${String(selectedDate.day).padStart(2, "0")}`;
+    let cancelled = false;
+    fetch(`/api/availability?room=${selectedRoom}&date=${dateStr}`)
+      .then(r => r.json())
+      .then(d => { if (!cancelled) setOccupiedSlots(d.occupied ?? []); })
+      .catch(() => { if (!cancelled) setOccupiedSlots([]); });
+    return () => { cancelled = true; };
+  }, [selectedRoom, selectedDate]);
 
   const room = rooms.find(r => r.id === selectedRoom);
   const total = room ? room.pricePerHour * duration : 0;
@@ -172,6 +181,11 @@ export default function BookingPage() {
   function formatDate() {
     if (!selectedDate) return "";
     return `${selectedDate.day} ${MONTHS_ES[selectedDate.month]} ${selectedDate.year}`;
+  }
+
+  function slotDateISO() {
+    if (!selectedDate) return "";
+    return `${selectedDate.year}-${String(selectedDate.month + 1).padStart(2, "0")}-${String(selectedDate.day).padStart(2, "0")}`;
   }
 
   async function goToPayment() {
@@ -187,6 +201,7 @@ export default function BookingPage() {
           date: formatDate(),
           time: selectedTime,
           duration,
+          slotDate: slotDateISO(),
         }),
       });
       const data = await res.json();
@@ -409,7 +424,7 @@ export default function BookingPage() {
   // ── Step: Date & time ──────────────────────────────────────────────────────
   if (step === "datetime") {
     const days = getDays(calMonth, calYear);
-    const booked = bookedSlots[selectedRoom ?? "dark"] ?? [];
+    const booked = occupiedSlots;
 
     return (
       <div className="min-h-screen bg-[#0A0A0A] px-5 md:px-12 py-24">

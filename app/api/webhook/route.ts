@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { sql } from "@/lib/db";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -127,6 +128,39 @@ export async function POST(request: Request) {
       confirmed_at: new Date().toISOString(),
       pin,
     };
+
+    // Save to the database (customer + booking) — powers real availability
+    try {
+      const email = intent.receipt_email ?? "";
+      let customerId: number | null = null;
+      if (email) {
+        const c = await sql`
+          insert into customers (email) values (${email})
+          on conflict (email) do update set email = excluded.email
+          returning id`;
+        customerId = c[0].id as number;
+      }
+      const slotDate = intent.metadata.slotDate;
+      const slotTime = intent.metadata.time;
+      if (slotDate && slotTime) {
+        const durHours = Number(intent.metadata.duration) || 1;
+        // Interpret "YYYY-MM-DD HH:MM" as Madrid local time (DST-safe) → timestamptz
+        const naive = `${slotDate} ${slotTime}:00`;
+        await sql`
+          insert into bookings
+            (customer_id, room_id, slot_start, slot_end, source, amount_paid, stripe_payment_intent, door_pin, status)
+          values (
+            ${customerId},
+            ${intent.metadata.room},
+            (${naive})::timestamp at time zone 'Europe/Madrid',
+            ((${naive})::timestamp at time zone 'Europe/Madrid') + (${durHours} || ' hours')::interval,
+            'single', ${intent.amount / 100}, ${intent.id}, ${pin}, 'confirmed'
+          )
+          on conflict (room_id, slot_start) do nothing`;
+      }
+    } catch (err) {
+      console.error("DB write error:", err);
+    }
 
     // Google Sheets — handle 302 redirect manually to keep POST method
     if (process.env.GOOGLE_SHEETS_WEBHOOK_URL) {

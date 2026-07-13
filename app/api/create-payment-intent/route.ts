@@ -5,7 +5,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
   try {
-    const { amount, room, date, time, duration } = await request.json();
+    const { amount, room, date, time, duration, slotDate } = await request.json();
 
     if (!amount || amount < 0.5) {
       return NextResponse.json({ error: "Importe inválido" }, { status: 400 });
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // céntimos
       currency: "eur",
-      metadata: { room, date, time, duration: String(duration) },
+      metadata: { room, date, time, duration: String(duration), slotDate: slotDate ?? "" },
     });
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
