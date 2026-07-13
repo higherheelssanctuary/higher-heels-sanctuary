@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getPinForHour } from "@/lib/pin";
-import { sendBookingConfirmation } from "@/lib/email";
+import { sendConfirmationEmail, sendAccessCodeEmail } from "@/lib/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -97,15 +97,21 @@ export async function POST(request: Request) {
       }
     }
 
-    // Email di conferma
-    await sendBookingConfirmation(booking.customer_email, {
+    // 1) Confirmation email (no PIN)
+    await sendConfirmationEmail(booking.customer_email, {
       room: booking.room,
       date: booking.date,
       time: booking.time,
       duration: booking.duration,
-      pin: booking.pin,
-      paymentLabel: "Importo pagato",
+      paymentLabel: "Importe pagado",
       paymentValue: `${booking.amount}€`,
+    });
+    // 2) Access-code email — TODO: move to the Nuki cron (~10 min before the slot)
+    await sendAccessCodeEmail(booking.customer_email, {
+      room: booking.room,
+      date: booking.date,
+      time: booking.time,
+      pin: booking.pin,
     });
   }
 

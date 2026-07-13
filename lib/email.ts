@@ -1,23 +1,18 @@
 import { Resend } from "resend";
 
-export type BookingEmail = {
-  room: string;
-  date: string;
-  time: string;
-  duration: string;
-  pin: string;
-  paymentLabel: string; // e.g. "Importo pagato" or "Reservado con"
-  paymentValue: string; // e.g. "25€" or "Bono Ritual"
-};
+const FROM = "Higher Heels Sanctuary <reservas@higherheels.es>";
 
-export function buildBookingEmailHtml(b: BookingEmail): string {
-  const rows: [string, string][] = [
-    ["Sala", b.room],
-    ["Data", b.date],
-    ["Orario", b.time],
-    ["Durata", `${b.duration} ora`],
-    [b.paymentLabel, b.paymentValue],
-  ];
+const ROOM_NAMES: Record<string, string> = {
+  dark: "Sensual",
+  clean: "Áurea",
+  moon: "Ares",
+  test: "Test",
+};
+const roomName = (id: string) => ROOM_NAMES[id] ?? id;
+const durationText = (d: string) => `${d} ${d === "1" ? "hora" : "horas"}`;
+
+// Shared dark/neon HTML wrapper. `header` is the red banner title.
+function shell(header: string, inner: string): string {
   return `
 <!DOCTYPE html>
 <html>
@@ -26,48 +21,14 @@ export function buildBookingEmailHtml(b: BookingEmail): string {
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 20px;">
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="background:#111;border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;">
-
-        <!-- Header -->
         <tr><td style="background:#FF1E3C;padding:32px;text-align:center;">
           <p style="margin:0;font-size:11px;letter-spacing:4px;color:rgba(255,255,255,0.7);text-transform:uppercase;">Higher Heels Sanctuary</p>
-          <h1 style="margin:8px 0 0;font-size:28px;font-weight:900;letter-spacing:2px;color:#fff;">PRENOTAZIONE CONFERMATA</h1>
+          <h1 style="margin:8px 0 0;font-size:26px;font-weight:900;letter-spacing:2px;color:#fff;">${header}</h1>
         </td></tr>
-
-        <!-- Body -->
-        <tr><td style="padding:36px 40px;">
-          <p style="margin:0 0 28px;color:rgba(245,245,245,0.6);font-size:14px;line-height:1.6;">
-            Grazie per la tua prenotazione. Ecco tutti i dettagli per la tua sessione.
-          </p>
-
-          <!-- Details -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid rgba(255,255,255,0.08);border-radius:8px;overflow:hidden;margin-bottom:28px;">
-            ${rows.map(([label, value], i) => `
-            <tr style="background:${i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent"}">
-              <td style="padding:14px 20px;font-size:12px;letter-spacing:1px;color:rgba(245,245,245,0.4);text-transform:uppercase;width:40%;">${label}</td>
-              <td style="padding:14px 20px;font-size:15px;font-weight:600;color:#f5f5f5;">${value}</td>
-            </tr>`).join("")}
-          </table>
-
-          <!-- PIN -->
-          <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,30,60,0.08);border:1px solid rgba(255,30,60,0.3);border-radius:8px;margin-bottom:28px;">
-            <tr><td style="padding:24px;text-align:center;">
-              <p style="margin:0 0 8px;font-size:11px;letter-spacing:3px;color:#FF1E3C;text-transform:uppercase;">Codice accesso ingresso</p>
-              <p style="margin:0;font-size:48px;font-weight:900;letter-spacing:12px;color:#fff;">${b.pin}</p>
-              <p style="margin:8px 0 0;font-size:11px;color:rgba(245,245,245,0.4);">Valido solo per l'orario prenotato · Cambia ogni ora</p>
-            </td></tr>
-          </table>
-
-          <p style="margin:0;font-size:13px;color:rgba(245,245,245,0.5);line-height:1.7;">
-            📍 <strong style="color:#f5f5f5;">Higher Heels Sanctuary</strong> — Madrid<br>
-            Inserisci il codice al pannello dell'ingresso principale. La tua sala sarà libera ad aspettarti.
-          </p>
-        </td></tr>
-
-        <!-- Footer -->
+        <tr><td style="padding:36px 40px;">${inner}</td></tr>
         <tr><td style="padding:20px 40px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
-          <p style="margin:0;font-size:11px;color:rgba(245,245,245,0.25);">Higher Heels Sanctuary · higherheels.es</p>
+          <p style="margin:0;font-size:11px;color:rgba(245,245,245,0.25);">Higher Heels Sanctuary · Madrid · higherheels.es</p>
         </td></tr>
-
       </table>
     </td></tr>
   </table>
@@ -75,15 +36,98 @@ export function buildBookingEmailHtml(b: BookingEmail): string {
 </html>`;
 }
 
-export async function sendBookingConfirmation(to: string, b: BookingEmail): Promise<void> {
+function detailsTable(rows: [string, string][]): string {
+  return `
+  <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid rgba(255,255,255,0.08);border-radius:8px;overflow:hidden;margin-bottom:28px;">
+    ${rows
+      .map(
+        ([label, value], i) => `
+    <tr style="background:${i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent"}">
+      <td style="padding:14px 20px;font-size:12px;letter-spacing:1px;color:rgba(245,245,245,0.4);text-transform:uppercase;width:42%;">${label}</td>
+      <td style="padding:14px 20px;font-size:15px;font-weight:600;color:#f5f5f5;">${value}</td>
+    </tr>`
+      )
+      .join("")}
+  </table>`;
+}
+
+async function send(to: string, subject: string, html: string): Promise<void> {
   if (!to || !process.env.RESEND_API_KEY) return;
   const resend = new Resend(process.env.RESEND_API_KEY.trim());
   await resend.emails
-    .send({
-      from: "Higher Heels Sanctuary <prenotazioni@higherheels.es>",
-      to,
-      subject: `Prenotazione confermata – ${b.date} alle ${b.time}`,
-      html: buildBookingEmailHtml(b),
-    })
+    .send({ from: FROM, to, subject, html })
     .catch((err) => console.error("Email error:", err));
+}
+
+// ── 1) Confirmation email (at booking time, no PIN) ─────────────────────────────
+// paymentLabel/paymentValue differ for single booking vs code redemption.
+export type ConfirmationEmail = {
+  room: string;
+  date: string;
+  time: string;
+  duration: string;
+  paymentLabel: string; // "Importe pagado" | "Reservado con"
+  paymentValue: string; // "25€" | "Bono Ritual · te quedan 4 entradas"
+};
+
+export function buildConfirmationEmailHtml(b: ConfirmationEmail): string {
+  const inner = `
+    <p style="margin:0 0 28px;color:rgba(245,245,245,0.6);font-size:14px;line-height:1.6;">
+      ¡Gracias por tu reserva! Aquí tienes los detalles de tu sesión.
+    </p>
+    ${detailsTable([
+      ["Sala", roomName(b.room)],
+      ["Fecha", b.date],
+      ["Hora", b.time],
+      ["Duración", durationText(b.duration)],
+      [b.paymentLabel, b.paymentValue],
+    ])}
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,30,60,0.06);border:1px solid rgba(255,30,60,0.25);border-radius:8px;margin-bottom:24px;">
+      <tr><td style="padding:18px 20px;font-size:13px;color:rgba(245,245,245,0.7);line-height:1.6;">
+        En breve recibirás tu <strong style="color:#f5f5f5;">código de acceso</strong> en un correo aparte.
+        Lo introducirás en el panel de la entrada principal justo antes de tu sesión.
+      </td></tr>
+    </table>
+    <p style="margin:0;font-size:12px;color:rgba(245,245,245,0.4);line-height:1.6;">
+      📍 Higher Heels Sanctuary — Madrid · Cancelación gratuita hasta 24h antes.
+    </p>`;
+  return shell("RESERVA CONFIRMADA", inner);
+}
+
+export async function sendConfirmationEmail(to: string, b: ConfirmationEmail): Promise<void> {
+  await send(to, `Reserva confirmada · ${b.date} a las ${b.time}`, buildConfirmationEmailHtml(b));
+}
+
+// ── 2) Access-code email (always the same; later sent ~10 min before) ───────────
+export type AccessCodeEmail = {
+  room: string;
+  date: string;
+  time: string;
+  pin: string;
+};
+
+export function buildAccessCodeEmailHtml(b: AccessCodeEmail): string {
+  const inner = `
+    <p style="margin:0 0 24px;color:rgba(245,245,245,0.6);font-size:14px;line-height:1.6;">
+      Este es tu código para acceder a Higher Heels Sanctuary. Guárdalo para tu sesión.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,30,60,0.08);border:1px solid rgba(255,30,60,0.3);border-radius:8px;margin-bottom:28px;">
+      <tr><td style="padding:24px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:11px;letter-spacing:3px;color:#FF1E3C;text-transform:uppercase;">Código de acceso</p>
+        <p style="margin:0;font-size:48px;font-weight:900;letter-spacing:12px;color:#fff;">${b.pin}</p>
+      </td></tr>
+    </table>
+    ${detailsTable([
+      ["Sala", roomName(b.room)],
+      ["Fecha", b.date],
+      ["Hora", b.time],
+    ])}
+    <p style="margin:0;font-size:13px;color:rgba(245,245,245,0.5);line-height:1.7;">
+      Introdúcelo en el panel de la entrada principal. Válido solo durante tu reserva.
+    </p>`;
+  return shell("TU CÓDIGO DE ACCESO", inner);
+}
+
+export async function sendAccessCodeEmail(to: string, b: AccessCodeEmail): Promise<void> {
+  await send(to, `Tu código de acceso · ${b.date} a las ${b.time}`, buildAccessCodeEmailHtml(b));
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getPinForHour } from "@/lib/pin";
-import { sendBookingConfirmation } from "@/lib/email";
+import { sendConfirmationEmail, sendAccessCodeEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -100,14 +100,21 @@ export async function POST(request: Request) {
       const cust = (await sql`select email from customers where id = ${customer_id}`) as { email: string }[];
       const email = cust[0]?.email;
       if (email) {
-        await sendBookingConfirmation(email, {
+        // 1) Confirmation email (no PIN) — shows the plan + remaining entries
+        await sendConfirmationEmail(email, {
           room,
           date: date ?? slotDate,
           time,
           duration: String(durHours),
-          pin,
           paymentLabel: "Reservado con",
-          paymentValue: `${plan_name} · quedan ${remaining_entries}`,
+          paymentValue: `${plan_name} · te quedan ${remaining_entries} entradas`,
+        });
+        // 2) Access-code email — TODO: move to the Nuki cron (~10 min before the slot)
+        await sendAccessCodeEmail(email, {
+          room,
+          date: date ?? slotDate,
+          time,
+          pin,
         });
       }
     }
