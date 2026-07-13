@@ -91,6 +91,17 @@ const DAYS_ES = ["L","M","X","J","V","S","D"];
 
 type Step = "room" | "datetime" | "summary" | "payment" | "confirmed";
 
+function reasonMessage(reason?: string): string {
+  switch (reason) {
+    case "not_found": return "Código no encontrado.";
+    case "inactive": return "Este código ya no está activo.";
+    case "expired": return "Este código ha caducado.";
+    case "empty": return "Este código no tiene entradas disponibles.";
+    case "slot_taken": return "Ese horario acaba de ocuparse. Elige otro.";
+    default: return "No se pudo aplicar el código. Inténtalo de nuevo.";
+  }
+}
+
 // ─── Step indicator ───────────────────────────────────────────────────────────
 const STEPS: { id: Step; label: string }[] = [
   { id: "room", label: "Sala" },
@@ -172,6 +183,56 @@ export default function BookingPage() {
       .catch(() => { if (!cancelled) setOccupiedSlots([]); });
     return () => { cancelled = true; };
   }, [selectedRoom, selectedDate]);
+
+  // Code redemption (bonos / membresías)
+  const [code, setCode] = useState("");
+  const [codeStatus, setCodeStatus] = useState<{ valid: boolean; plan_name?: string; remaining?: number; reason?: string } | null>(null);
+  const [codeLoading, setCodeLoading] = useState(false);
+  const [redeeming, setRedeeming] = useState(false);
+
+  async function applyCode() {
+    if (!code.trim()) return;
+    setCodeLoading(true);
+    setCodeStatus(null);
+    try {
+      const r = await fetch(`/api/redeem-code?code=${encodeURIComponent(code.trim())}`).then(res => res.json());
+      setCodeStatus(r);
+    } catch {
+      setCodeStatus({ valid: false, reason: "error" });
+    } finally {
+      setCodeLoading(false);
+    }
+  }
+
+  async function confirmWithCode() {
+    setRedeeming(true);
+    setPaymentError(null);
+    try {
+      const res = await fetch("/api/redeem-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: code.trim(),
+          room: selectedRoom,
+          slotDate: slotDateISO(),
+          time: selectedTime,
+          date: formatDate(),
+          duration,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setPaymentError(reasonMessage(data.reason));
+        if (data.reason === "slot_taken" || data.reason === "empty") setCodeStatus(null);
+        return;
+      }
+      setStep("confirmed");
+    } catch {
+      setPaymentError("No se pudo confirmar. Inténtalo de nuevo.");
+    } finally {
+      setRedeeming(false);
+    }
+  }
 
   const room = rooms.find(r => r.id === selectedRoom);
   const total = room ? room.pricePerHour * duration : 0;
@@ -666,22 +727,69 @@ export default function BookingPage() {
             </div>
           </div>
 
+          {/* Redeem a bono / membresía code */}
+          <div className="rounded-xl p-4 mb-6" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <p className="text-[#F5F5F5]/60 text-xs mb-3" style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em" }}>
+              ¿TIENES UN BONO O MEMBRESÍA?
+            </p>
+            <div className="flex gap-2">
+              <input
+                value={code}
+                onChange={e => { setCode(e.target.value); setCodeStatus(null); }}
+                placeholder="HHS-XXXXX"
+                className="flex-1 h-11 px-3 rounded-lg text-[#F5F5F5] text-sm focus:outline-none"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", letterSpacing: "0.05em" }}
+              />
+              <button
+                onClick={applyCode}
+                disabled={codeLoading || !code.trim()}
+                className="h-11 px-5 rounded-lg text-sm disabled:opacity-40"
+                style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.08em", background: "rgba(255,255,255,0.08)", color: "#F5F5F5" }}
+              >
+                {codeLoading ? "..." : "APLICAR"}
+              </button>
+            </div>
+            {codeStatus?.valid && (
+              <p className="text-green-400 text-xs mt-2">✓ Código válido · {codeStatus.plan_name} · quedan {codeStatus.remaining} entradas</p>
+            )}
+            {codeStatus && !codeStatus.valid && (
+              <p className="text-red-400 text-xs mt-2">{reasonMessage(codeStatus.reason)}</p>
+            )}
+          </div>
+
           {paymentError && (
             <p className="text-red-400 text-sm mb-4 text-center">{paymentError}</p>
           )}
-          <button
-            onClick={goToPayment}
-            disabled={paymentLoading}
-            className="w-full h-14 text-white text-lg tracking-widest transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
-            style={{
-              fontFamily: "var(--font-bebas-neue)",
-              letterSpacing: "0.12em",
-              background: "#FF1E3C",
-              boxShadow: "0 0 40px rgba(255,30,60,0.5)",
-            }}
-          >
-            {paymentLoading ? "PREPARANDO PAGO..." : `PROCEDER AL PAGO · ${total}€`}
-          </button>
+
+          {codeStatus?.valid ? (
+            <button
+              onClick={confirmWithCode}
+              disabled={redeeming}
+              className="w-full h-14 text-white text-lg tracking-widest transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
+              style={{
+                fontFamily: "var(--font-bebas-neue)",
+                letterSpacing: "0.12em",
+                background: "#FF1E3C",
+                boxShadow: "0 0 40px rgba(255,30,60,0.5)",
+              }}
+            >
+              {redeeming ? "CONFIRMANDO..." : "CONFIRMAR RESERVA · SIN PAGO"}
+            </button>
+          ) : (
+            <button
+              onClick={goToPayment}
+              disabled={paymentLoading}
+              className="w-full h-14 text-white text-lg tracking-widest transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
+              style={{
+                fontFamily: "var(--font-bebas-neue)",
+                letterSpacing: "0.12em",
+                background: "#FF1E3C",
+                boxShadow: "0 0 40px rgba(255,30,60,0.5)",
+              }}
+            >
+              {paymentLoading ? "PREPARANDO PAGO..." : `PROCEDER AL PAGO · ${total}€`}
+            </button>
+          )}
         </div>
       </div>
     );
