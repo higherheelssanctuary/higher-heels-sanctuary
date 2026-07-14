@@ -14,19 +14,14 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Expand each booking to every hour it covers, so a multi-hour
-    // session (e.g. 15:00 for 2h) blocks both 15:00 and 16:00.
+    // Sessions are fixed, non-overlapping 1.5h blocks aligned to the grid,
+    // so a booking occupies exactly its own start slot.
     const rows = await sql`
-      select distinct to_char(gs at time zone 'Europe/Madrid', 'HH24:MI') as time
-      from bookings b
-      cross join lateral generate_series(
-        b.slot_start,
-        b.slot_end - interval '1 minute',
-        interval '1 hour'
-      ) gs
-      where b.room_id = ${room}
-        and b.status = 'confirmed'
-        and (gs at time zone 'Europe/Madrid')::date = ${date}::date
+      select to_char(slot_start at time zone 'Europe/Madrid', 'HH24:MI') as time
+      from bookings
+      where room_id = ${room}
+        and (slot_start at time zone 'Europe/Madrid')::date = ${date}::date
+        and status = 'confirmed'
     `;
     const occupied = rows.map((r) => r.time as string);
     return NextResponse.json({ occupied });

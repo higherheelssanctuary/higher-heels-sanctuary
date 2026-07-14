@@ -53,12 +53,22 @@ const rooms = [
   },
 ];
 
-// ─── Time slots ────────────────────────────────────────────────────────────────
+// ─── Time slots — 1.5h blocks across the 24/7 day ───────────────────────────────
 const timeSlots = [
-  "08:00", "09:00", "10:00", "11:00", "12:00", "13:00",
-  "14:00", "15:00", "16:00", "17:00", "18:00", "19:00",
-  "20:00", "21:00", "22:00",
+  "00:00", "01:30", "03:00", "04:30",
+  "06:00", "07:30", "09:00", "10:30",
+  "12:00", "13:30", "15:00", "16:30",
+  "18:00", "19:30", "21:00", "22:30",
 ];
+
+// "01:30" → "01:30 – 03:00"
+function slotRange(start: string): string {
+  const [h, m] = start.split(":").map(Number);
+  const endMin = h * 60 + m + 90;
+  const eh = String(Math.floor(endMin / 60) % 24).padStart(2, "0");
+  const em = String(endMin % 60).padStart(2, "0");
+  return `${start} – ${eh}:${em}`;
+}
 
 // ─── Bonos & Membresías ─────────────────────────────────────────────────────────
 type PlanType = "single" | "bonos" | "membresias";
@@ -571,9 +581,9 @@ export default function BookingPage() {
             {/* Time slots + duration */}
             <div>
               <p className="text-[#F5F5F5]/40 text-xs tracking-widest mb-3" style={{ fontFamily: "var(--font-bebas-neue)" }}>
-                HORA DE INICIO
+                FRANJA HORARIA
               </p>
-              <div className="grid grid-cols-3 gap-2 mb-6">
+              <div className="grid grid-cols-2 gap-2 mb-6">
                 {timeSlots.map(t => {
                   const isBooked = booked.includes(t);
                   const isSelected = selectedTime === t;
@@ -582,7 +592,7 @@ export default function BookingPage() {
                       key={t}
                       onClick={() => !isBooked && setSelectedTime(t)}
                       disabled={isBooked}
-                      className="h-10 rounded-lg text-sm tracking-wider transition-all"
+                      className="h-10 rounded-lg text-sm tracking-wide transition-all"
                       style={{
                         fontFamily: "var(--font-bebas-neue)",
                         background: isSelected ? "#FF1E3C" : isBooked ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.06)",
@@ -593,7 +603,7 @@ export default function BookingPage() {
                         boxShadow: isSelected ? "0 0 14px rgba(255,30,60,0.4)" : "none",
                       }}
                     >
-                      {t}
+                      {slotRange(t)}
                     </button>
                   );
                 })}
