@@ -160,7 +160,7 @@ export default function BookingPage() {
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<{ day: number; month: number; year: number } | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [duration, setDuration] = useState(1);
+  const duration = 1.5; // fixed 1.5h sessions
   const [calMonth, setCalMonth] = useState(new Date().getMonth());
   const [calYear, setCalYear] = useState(new Date().getFullYear());
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -235,7 +235,7 @@ export default function BookingPage() {
   }
 
   const room = rooms.find(r => r.id === selectedRoom);
-  const total = room ? room.pricePerHour * duration : 0;
+  const total = room ? room.pricePerHour : 0; // flat price per 1.5h session
 
   const today = new Date();
 
@@ -451,7 +451,7 @@ export default function BookingPage() {
                     <div className="flex items-end justify-between">
                       <div>
                         <span className="text-2xl font-bold" style={{ color: r.accent }}>{r.pricePerHour}€</span>
-                        <span className="text-xs ml-1" style={{ color: r.textLight ? "rgba(245,245,245,0.4)" : "rgba(26,26,26,0.4)" }}>/hora</span>
+                        <span className="text-xs ml-1" style={{ color: r.textLight ? "rgba(245,245,245,0.4)" : "rgba(26,26,26,0.4)" }}>/ sesión (1h 30min)</span>
                       </div>
                     </div>
                   </div>
@@ -602,23 +602,8 @@ export default function BookingPage() {
               <p className="text-[#F5F5F5]/40 text-xs tracking-widest mb-3" style={{ fontFamily: "var(--font-bebas-neue)" }}>
                 DURACIÓN
               </p>
-              <div className="flex gap-2">
-                {[1, 2, 3].map(h => (
-                  <button
-                    key={h}
-                    onClick={() => setDuration(h)}
-                    className="flex-1 h-10 rounded-lg text-sm transition-all"
-                    style={{
-                      fontFamily: "var(--font-bebas-neue)",
-                      background: duration === h ? "#FF1E3C" : "rgba(255,255,255,0.06)",
-                      color: duration === h ? "#fff" : "rgba(245,245,245,0.7)",
-                      border: `1px solid ${duration === h ? "#FF1E3C" : "rgba(255,255,255,0.06)"}`,
-                      boxShadow: duration === h ? "0 0 14px rgba(255,30,60,0.4)" : "none",
-                    }}
-                  >
-                    {h}h
-                  </button>
-                ))}
+              <div className="rounded-lg px-4 py-3 text-sm" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <span className="text-[#F5F5F5]">Cada sesión dura <strong>1 hora y media</strong> (1h 30min).</span>
               </div>
 
               {selectedTime && selectedDate && (
@@ -634,8 +619,8 @@ export default function BookingPage() {
                     <Clock size={14} />
                     <span>{selectedTime} → {(() => {
                       const [h, m] = selectedTime.split(":").map(Number);
-                      const end = new Date(0, 0, 0, h + duration, m);
-                      return `${String(end.getHours()).padStart(2,"0")}:${String(end.getMinutes()).padStart(2,"0")}`;
+                      const endMin = h * 60 + m + 90;
+                      return `${String(Math.floor(endMin / 60)).padStart(2,"0")}:${String(endMin % 60).padStart(2,"0")}`;
                     })()}</span>
                     <span className="ml-auto text-[#FF1E3C] font-bold">{total}€</span>
                   </div>
@@ -697,8 +682,8 @@ export default function BookingPage() {
             <div className="divide-y divide-white/05">
               {[
                 { icon: <Calendar size={15} />, label: "Fecha", value: formatDate() },
-                { icon: <Clock size={15} />, label: "Hora", value: `${selectedTime} · ${duration}h` },
-                { icon: <CreditCard size={15} />, label: "Precio", value: `${room?.pricePerHour}€/h × ${duration}h` },
+                { icon: <Clock size={15} />, label: "Hora", value: `${selectedTime} · 1h 30min` },
+                { icon: <CreditCard size={15} />, label: "Precio", value: `${room?.pricePerHour}€ / sesión` },
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-3 px-5 py-4">
                   <span className="text-[#F5F5F5]/30">{row.icon}</span>
@@ -817,7 +802,7 @@ export default function BookingPage() {
           >
             <div>
               <p className="text-[#F5F5F5]/70 font-medium">{room?.title}</p>
-              <p className="text-[#F5F5F5]/30 text-xs mt-0.5">{formatDate()} · {selectedTime} · {duration}h</p>
+              <p className="text-[#F5F5F5]/30 text-xs mt-0.5">{formatDate()} · {selectedTime} · 1h 30min</p>
             </div>
             <span className="text-xl font-bold" style={{ color: room?.accent }}>{total}€</span>
           </div>
@@ -870,7 +855,7 @@ export default function BookingPage() {
             {room?.title}
           </h2>
           <p className="text-sm mt-1" style={{ color: room?.textLight ? "rgba(245,245,245,0.6)" : "rgba(26,26,26,0.5)" }}>
-            {formatDate()} · {selectedTime} · {duration}h
+            {formatDate()} · {selectedTime} · 1h 30min
           </p>
         </div>
 
@@ -902,7 +887,7 @@ export default function BookingPage() {
           VOLVER AL INICIO
         </Link>
         <button
-          onClick={() => { setStep("room"); setSelectedRoom(null); setSelectedDate(null); setSelectedTime(null); setDuration(1); }}
+          onClick={() => { setStep("room"); setSelectedRoom(null); setSelectedDate(null); setSelectedTime(null); }}
           className="flex items-center gap-2 h-12 px-6 text-white text-sm tracking-widest transition-all hover:scale-105 active:scale-95"
           style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.1em", background: "#FF1E3C", boxShadow: "0 0 20px rgba(255,30,60,0.4)" }}
         >

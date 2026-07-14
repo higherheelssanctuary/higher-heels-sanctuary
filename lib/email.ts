@@ -9,7 +9,11 @@ const ROOM_NAMES: Record<string, string> = {
   test: "Test",
 };
 const roomName = (id: string) => ROOM_NAMES[id] ?? id;
-const durationText = (d: string) => `${d} ${d === "1" ? "hora" : "horas"}`;
+const durationText = (d: string) => {
+  if (d === "1.5") return "1 hora y media";
+  if (d === "1") return "1 hora";
+  return `${d} horas`;
+};
 
 // Shared dark/neon HTML wrapper. `header` is the red banner title.
 function shell(header: string, inner: string): string {
