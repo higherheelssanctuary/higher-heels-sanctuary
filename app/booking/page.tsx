@@ -55,9 +55,9 @@ const rooms = [
 
 // ─── Time slots — 1.5h blocks across the 24/7 day, grouped in 3 arcs ─────────────
 const TIME_ARCS = [
+  { id: "madrugada", label: "MADRUGADA", range: "00:00 – 06:00", slots: ["00:00", "01:30", "03:00", "04:30"] },
   { id: "dia", label: "DÍA", range: "06:00 – 18:00", slots: ["06:00", "07:30", "09:00", "10:30", "12:00", "13:30", "15:00", "16:30"] },
   { id: "noche", label: "NOCHE", range: "18:00 – 00:00", slots: ["18:00", "19:30", "21:00", "22:30"] },
-  { id: "madrugada", label: "MADRUGADA", range: "00:00 – 06:00", slots: ["00:00", "01:30", "03:00", "04:30"] },
 ];
 
 // "01:30" → "01:30 – 03:00"
