@@ -53,12 +53,11 @@ const rooms = [
   },
 ];
 
-// ─── Time slots — 1.5h blocks across the 24/7 day ───────────────────────────────
-const timeSlots = [
-  "00:00", "01:30", "03:00", "04:30",
-  "06:00", "07:30", "09:00", "10:30",
-  "12:00", "13:30", "15:00", "16:30",
-  "18:00", "19:30", "21:00", "22:30",
+// ─── Time slots — 1.5h blocks across the 24/7 day, grouped in 3 arcs ─────────────
+const TIME_ARCS = [
+  { id: "dia", label: "DÍA", range: "06:00 – 18:00", slots: ["06:00", "07:30", "09:00", "10:30", "12:00", "13:30", "15:00", "16:30"] },
+  { id: "noche", label: "NOCHE", range: "18:00 – 00:00", slots: ["18:00", "19:30", "21:00", "22:30"] },
+  { id: "madrugada", label: "MADRUGADA", range: "00:00 – 06:00", slots: ["00:00", "01:30", "03:00", "04:30"] },
 ];
 
 // "01:30" → "01:30 – 03:00"
@@ -178,6 +177,7 @@ export default function BookingPage() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [planType, setPlanType] = useState<PlanType>("single");
   const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
+  const [timeArc, setTimeArc] = useState<string>("dia");
 
   // Fetch real availability from the DB whenever room + date change
   useEffect(() => {
@@ -510,14 +510,25 @@ export default function BookingPage() {
             ELIGE FECHA Y HORA
           </h1>
           {room && (
-            <p className="text-sm mb-8" style={{ color: room.accent }}>
+            <p className="text-sm mb-4" style={{ color: room.accent }}>
               {room.title}
             </p>
           )}
 
+          {/* Mini guide */}
+          <div className="mb-8 rounded-xl px-4 py-3 flex items-start gap-3" style={{ background: "rgba(255,30,60,0.06)", border: "1px solid rgba(255,30,60,0.15)" }}>
+            <Clock size={16} className="flex-shrink-0 mt-0.5" style={{ color: "#FF1E3C" }} />
+            <p className="text-[#F5F5F5]/70 text-sm leading-relaxed">
+              Reserva en 2 pasos: elige el <strong className="text-[#F5F5F5]">día</strong> y luego tu <strong className="text-[#F5F5F5]">franja horaria</strong>. Cada sesión dura <strong className="text-[#F5F5F5]">1h 30min</strong> y la sala es solo para ti.
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-8">
             {/* Calendar */}
             <div className="rounded-2xl border border-white/08 p-5" style={{ background: "rgba(255,255,255,0.03)" }}>
+              <p className="text-[#F5F5F5]/40 text-xs tracking-widest mb-4" style={{ fontFamily: "var(--font-bebas-neue)" }}>
+                1 · ELIGE EL DÍA
+              </p>
               {/* Month nav */}
               <div className="flex items-center justify-between mb-4">
                 <button
@@ -581,10 +592,38 @@ export default function BookingPage() {
             {/* Time slots + duration */}
             <div>
               <p className="text-[#F5F5F5]/40 text-xs tracking-widest mb-3" style={{ fontFamily: "var(--font-bebas-neue)" }}>
-                FRANJA HORARIA
+                2 · ELIGE TU FRANJA
               </p>
+
+              {/* Time-arc tabs (Día by default) */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {TIME_ARCS.map(arc => {
+                  const active = timeArc === arc.id;
+                  return (
+                    <button
+                      key={arc.id}
+                      onClick={() => setTimeArc(arc.id)}
+                      className="rounded-lg py-2 transition-all flex flex-col items-center"
+                      style={{
+                        background: active ? "#FF1E3C" : "rgba(255,255,255,0.05)",
+                        border: `1px solid ${active ? "#FF1E3C" : "rgba(255,255,255,0.08)"}`,
+                        boxShadow: active ? "0 0 14px rgba(255,30,60,0.4)" : "none",
+                      }}
+                    >
+                      <span className="text-sm tracking-wide" style={{ fontFamily: "var(--font-bebas-neue)", color: active ? "#fff" : "rgba(245,245,245,0.75)" }}>
+                        {arc.label}
+                      </span>
+                      <span className="text-[9px] mt-0.5" style={{ color: active ? "rgba(255,255,255,0.8)" : "rgba(245,245,245,0.35)" }}>
+                        {arc.range}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Slots of the selected arc */}
               <div className="grid grid-cols-2 gap-2 mb-6">
-                {timeSlots.map(t => {
+                {(TIME_ARCS.find(a => a.id === timeArc)?.slots ?? []).map(t => {
                   const isBooked = booked.includes(t);
                   const isSelected = selectedTime === t;
                   return (
