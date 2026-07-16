@@ -13,7 +13,6 @@ type Room = {
   description: string;
   badge: string;
   features: string[];
-  price: number;
   accent: string;
   envClass: string;
   image: string;
@@ -36,7 +35,6 @@ const rooms: Room[] = [
       "Iluminación dual",
       "Sala domotizada",
     ],
-    price: 25,
     accent: "#FF1E3C",
     envClass: "room-env-dark",
     image: "/images/rooms/sensual-portrait.png",
@@ -56,7 +54,6 @@ const rooms: Room[] = [
       "Insonorización",
       "Sala domotizada",
     ],
-    price: 25,
     accent: "#8B0000",
     envClass: "room-env-clean",
     image: "/images/rooms/clean-soft-portrait.png",
@@ -79,7 +76,6 @@ const rooms: Room[] = [
       "Insonorización",
       "Sala domotizada",
     ],
-    price: 25,
     accent: "#8CA0FF",
     envClass: "room-env-moon",
     image: "/images/rooms/moonlight-portrait.png",

@@ -16,7 +16,7 @@ const rooms = [
     bg: "radial-gradient(ellipse at 50% 40%, rgba(255,30,60,0.14) 0%, rgba(10,10,10,0) 65%), #0A0A0A",
     textLight: true,
     features: ["Círculo LED rojo", "Proyector dinámico", "Iluminación dual", "Barras profesionales"],
-    pricePerHour: 25,
+    price: 18.90,
   },
   {
     id: "clean",
@@ -27,7 +27,7 @@ const rooms = [
     bg: "radial-gradient(ellipse at 50% 0%, rgba(255,230,230,0.6) 0%, #F0EEEB 60%)",
     textLight: false,
     features: ["Paredes blancas", "Luz de entrenamiento", "Teléfono rojo iconic", "Doble espejo"],
-    pricePerHour: 25,
+    price: 18.90,
   },
   {
     id: "moon",
@@ -38,7 +38,7 @@ const rooms = [
     bg: "radial-gradient(ellipse at 50% 15%, rgba(100,120,255,0.2) 0%, rgba(8,11,24,0) 60%), #080B14",
     textLight: true,
     features: ["Luna retroiluminada", "Barra aérea", "Atmósfera nocturna", "Tonos fríos suaves"],
-    pricePerHour: 25,
+    price: 18.90,
   },
   {
     id: "test",
@@ -49,7 +49,7 @@ const rooms = [
     bg: "radial-gradient(ellipse at 50% 40%, rgba(34,197,94,0.1) 0%, #0a0a0a 65%), #0a0a0a",
     textLight: true,
     features: ["Pago €0.50", "Email con PIN", "Google Sheets", "Webhook test"],
-    pricePerHour: 0.5,
+    price: 0.5,
   },
 ];
 
@@ -73,16 +73,19 @@ function slotRange(start: string): string {
 type PlanType = "single" | "bonos" | "membresias";
 
 const bonos = [
-  { id: "esencia", name: "Esencia", entradas: 5, price: 115, tag: "" },
-  { id: "ritual", name: "Ritual", entradas: 10, price: 210, tag: "POPULAR" },
-  { id: "elite", name: "Élite", entradas: 20, price: 400, tag: "" },
+  { id: "esencia", name: "Esencia", entradas: 4, price: 71.82, tag: "" },
+  { id: "ritual", name: "Ritual", entradas: 8, price: 134.57, tag: "POPULAR" },
+  { id: "elite", name: "Élite", entradas: 16, price: 247.97, tag: "" },
 ];
 
 const membresias = [
-  { id: "plata", name: "Plata", entradas: 4, price: 90, tag: "" },
-  { id: "oro", name: "Oro", entradas: 8, price: 165, tag: "POPULAR" },
-  { id: "platino", name: "Platino", entradas: 15, price: 280, tag: "" },
+  { id: "plata", name: "Plata", entradas: 4, price: 57.46, tag: "" },
+  { id: "oro", name: "Oro", entradas: 6, price: 75.98, tag: "POPULAR" },
+  { id: "platino", name: "Platino", entradas: 8, price: 80.80, tag: "" },
 ];
+
+// 18.90 → "18,90€"  (plain `${n}€` would render 18.90 as "18.9€")
+const eur = (n: number) => `${n.toFixed(2).replace(".", ",")}€`;
 
 // ─── Date helpers ──────────────────────────────────────────────────────────────
 function getDays(month: number, year: number) {
@@ -245,7 +248,7 @@ export default function BookingPage() {
   }
 
   const room = rooms.find(r => r.id === selectedRoom);
-  const total = room ? room.pricePerHour : 0; // flat price per 1.5h session
+  const total = room ? room.price : 0; // flat price per 1.5h session
 
   const today = new Date();
 
@@ -366,7 +369,7 @@ export default function BookingPage() {
                     </p>
                     <div className="mb-2">
                       <span className="text-4xl" style={{ fontFamily: "var(--font-bebas-neue)", color: "#F5F5F5" }}>
-                        {p.price}€
+                        {eur(p.price)}
                       </span>
                       {planType === "membresias" && <span className="text-sm text-[#F5F5F5]/40"> /mes</span>}
                     </div>
@@ -460,7 +463,7 @@ export default function BookingPage() {
                     </ul>
                     <div className="flex items-end justify-between">
                       <div>
-                        <span className="text-2xl font-bold" style={{ color: r.accent }}>{r.pricePerHour}€</span>
+                        <span className="text-2xl font-bold" style={{ color: r.accent }}>{eur(r.price)}</span>
                         <span className="text-xs ml-1" style={{ color: r.textLight ? "rgba(245,245,245,0.4)" : "rgba(26,26,26,0.4)" }}>/ sesión (1h 30min)</span>
                       </div>
                     </div>
@@ -671,7 +674,7 @@ export default function BookingPage() {
                       const endMin = h * 60 + m + 90;
                       return `${String(Math.floor(endMin / 60)).padStart(2,"0")}:${String(endMin % 60).padStart(2,"0")}`;
                     })()}</span>
-                    <span className="ml-auto text-[#FF1E3C] font-bold">{total}€</span>
+                    <span className="ml-auto text-[#FF1E3C] font-bold">{eur(total)}</span>
                   </div>
                 </div>
               )}
@@ -732,7 +735,7 @@ export default function BookingPage() {
               {[
                 { icon: <Calendar size={15} />, label: "Fecha", value: formatDate() },
                 { icon: <Clock size={15} />, label: "Hora", value: `${selectedTime} · 1h 30min` },
-                { icon: <CreditCard size={15} />, label: "Precio", value: `${room?.pricePerHour}€ / sesión` },
+                { icon: <CreditCard size={15} />, label: "Precio", value: `${eur(total)} / sesión` },
               ].map(row => (
                 <div key={row.label} className="flex items-center gap-3 px-5 py-4">
                   <span className="text-[#F5F5F5]/30">{row.icon}</span>
@@ -744,7 +747,7 @@ export default function BookingPage() {
               ))}
               <div className="flex items-center px-5 py-4">
                 <span className="text-[#F5F5F5]/40 text-sm" style={{ fontFamily: "var(--font-bebas-neue)", letterSpacing: "0.05em" }}>TOTAL</span>
-                <span className="ml-auto text-2xl font-bold" style={{ color: room?.accent }}>{total}€</span>
+                <span className="ml-auto text-2xl font-bold" style={{ color: room?.accent }}>{eur(total)}</span>
               </div>
             </div>
           </div>
@@ -821,7 +824,7 @@ export default function BookingPage() {
                 boxShadow: "0 0 40px rgba(255,30,60,0.5)",
               }}
             >
-              {paymentLoading ? "PREPARANDO PAGO..." : `PROCEDER AL PAGO · ${total}€`}
+              {paymentLoading ? "PREPARANDO PAGO..." : `PROCEDER AL PAGO · ${eur(total)}`}
             </button>
           )}
         </div>
@@ -853,7 +856,7 @@ export default function BookingPage() {
               <p className="text-[#F5F5F5]/70 font-medium">{room?.title}</p>
               <p className="text-[#F5F5F5]/30 text-xs mt-0.5">{formatDate()} · {selectedTime} · 1h 30min</p>
             </div>
-            <span className="text-xl font-bold" style={{ color: room?.accent }}>{total}€</span>
+            <span className="text-xl font-bold" style={{ color: room?.accent }}>{eur(total)}</span>
           </div>
 
           {/* Stripe Elements */}
