@@ -7,17 +7,20 @@ import { readFileSync } from "node:fs";
 import Stripe from "stripe";
 
 const env = readFileSync(new URL("../.env.local", import.meta.url), "utf8");
-const key = (env.match(/^STRIPE_SECRET_KEY=(.+)$/m)?.[1] || "").trim();
+const wantLive = process.argv.includes("--live");
+// --live uses STRIPE_SECRET_KEY_LIVE (kept separate so the test key stays intact).
+const key = wantLive
+  ? (env.match(/^STRIPE_SECRET_KEY_LIVE=(.+)$/m)?.[1] || "").trim()
+  : (env.match(/^STRIPE_SECRET_KEY=(.+)$/m)?.[1] || "").trim();
 if (!key) {
-  console.error("✗ STRIPE_SECRET_KEY missing in .env.local");
+  console.error(`✗ ${wantLive ? "STRIPE_SECRET_KEY_LIVE" : "STRIPE_SECRET_KEY"} missing in .env.local`);
   process.exit(1);
 }
-const isLive = key.startsWith("sk_live");
-if (isLive && !process.argv.includes("--live")) {
-  console.error("✗ That is a LIVE key. Re-run with --live if you really mean it.");
+if (wantLive && !key.startsWith("sk_live")) {
+  console.error("✗ --live given but STRIPE_SECRET_KEY_LIVE is not an sk_live_ key.");
   process.exit(1);
 }
-console.log(`Mode: ${isLive ? "LIVE" : "TEST"}\n`);
+console.log(`Mode: ${wantLive ? "LIVE" : "TEST"}\n`);
 
 const stripe = new Stripe(key);
 
