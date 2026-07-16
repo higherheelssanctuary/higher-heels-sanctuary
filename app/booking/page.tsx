@@ -16,7 +16,7 @@ const rooms = [
     bg: "radial-gradient(ellipse at 50% 40%, rgba(255,30,60,0.14) 0%, rgba(10,10,10,0) 65%), #0A0A0A",
     textLight: true,
     features: ["Círculo LED rojo", "Proyector dinámico", "Iluminación dual", "Barras profesionales"],
-    price: 18.90,
+    price: 18.99,
   },
   {
     id: "clean",
@@ -27,7 +27,7 @@ const rooms = [
     bg: "radial-gradient(ellipse at 50% 0%, rgba(255,230,230,0.6) 0%, #F0EEEB 60%)",
     textLight: false,
     features: ["Paredes blancas", "Luz de entrenamiento", "Teléfono rojo iconic", "Doble espejo"],
-    price: 18.90,
+    price: 18.99,
   },
   {
     id: "moon",
@@ -38,7 +38,7 @@ const rooms = [
     bg: "radial-gradient(ellipse at 50% 15%, rgba(100,120,255,0.2) 0%, rgba(8,11,24,0) 60%), #080B14",
     textLight: true,
     features: ["Luna retroiluminada", "Barra aérea", "Atmósfera nocturna", "Tonos fríos suaves"],
-    price: 18.90,
+    price: 18.99,
   },
   {
     id: "test",
@@ -73,15 +73,15 @@ function slotRange(start: string): string {
 type PlanType = "single" | "bonos" | "membresias";
 
 const bonos = [
-  { id: "esencia", name: "Esencia", entradas: 4, price: 71.82, tag: "" },
-  { id: "ritual", name: "Ritual", entradas: 8, price: 134.57, tag: "POPULAR" },
-  { id: "elite", name: "Élite", entradas: 16, price: 247.97, tag: "" },
+  { id: "esencia", name: "Esencia", entradas: 4, price: 71.99, tag: "" },
+  { id: "ritual", name: "Ritual", entradas: 8, price: 134.99, tag: "POPULAR" },
+  { id: "elite", name: "Élite", entradas: 16, price: 247.99, tag: "" },
 ];
 
 const membresias = [
-  { id: "plata", name: "Plata", entradas: 4, price: 57.46, tag: "" },
-  { id: "oro", name: "Oro", entradas: 6, price: 75.98, tag: "POPULAR" },
-  { id: "platino", name: "Platino", entradas: 8, price: 80.80, tag: "" },
+  { id: "plata", name: "Plata", entradas: 4, price: 56.99, tag: "" },
+  { id: "oro", name: "Oro", entradas: 6, price: 75.99, tag: "POPULAR" },
+  { id: "platino", name: "Platino", entradas: 8, price: 80.99, tag: "" },
 ];
 
 // 18.90 → "18,90€"  (plain `${n}€` would render 18.90 as "18.9€")
