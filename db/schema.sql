@@ -64,6 +64,10 @@ create table if not exists app_users (
   created_at     timestamptz not null default now()
 );
 
+-- Nuki keypad auth id, so the code can be revoked after the session.
+-- (Idempotent: safe to re-run.)
+alter table bookings add column if not exists nuki_auth_id text;
+
 -- Indexes for the common lookups
 create index if not exists idx_bookings_customer  on bookings(customer_id);
 create index if not exists idx_bookings_affiliate on bookings(affiliate_code);
