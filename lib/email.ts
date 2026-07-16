@@ -135,3 +135,38 @@ export function buildAccessCodeEmailHtml(b: AccessCodeEmail): string {
 export async function sendAccessCodeEmail(to: string, b: AccessCodeEmail): Promise<void> {
   await send(to, `Tu código de acceso · ${b.date} a las ${b.time}`, buildAccessCodeEmailHtml(b));
 }
+
+// ── 3) Purchase email — delivers the reusable bono / membresía code ─────────────
+export type PurchaseEmail = {
+  planLabel: string; // e.g. "Bono Ritual" / "Membresía Oro"
+  entradas: number;
+  code: string; // HHS-XXXXX
+  isSubscription: boolean;
+};
+
+export function buildPurchaseEmailHtml(b: PurchaseEmail): string {
+  const validity = b.isSubscription
+    ? "Se renueva cada mes. Cancela cuando quieras."
+    : "Válido 6 meses desde la compra.";
+  const inner = `
+    <p style="margin:0 0 24px;color:rgba(245,245,245,0.6);font-size:14px;line-height:1.6;">
+      ¡Gracias por tu compra! Este es tu código de <strong style="color:#f5f5f5;">${b.planLabel}</strong>.
+      Guárdalo: lo usarás para reservar tus sesiones.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(255,30,60,0.08);border:1px solid rgba(255,30,60,0.3);border-radius:8px;margin-bottom:28px;">
+      <tr><td style="padding:24px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:11px;letter-spacing:3px;color:#FF1E3C;text-transform:uppercase;">Tu código</p>
+        <p style="margin:0;font-size:38px;font-weight:900;letter-spacing:6px;color:#fff;">${b.code}</p>
+        <p style="margin:10px 0 0;font-size:13px;color:rgba(245,245,245,0.6);">${b.entradas} entradas · ${validity}</p>
+      </td></tr>
+    </table>
+    <p style="margin:0;font-size:13px;color:rgba(245,245,245,0.5);line-height:1.7;">
+      <strong style="color:#f5f5f5;">Cómo usarlo:</strong> entra en higherheels.es/booking, elige sala, fecha y franja,
+      y en el resumen introduce este código en <em>“¿Tienes un bono o membresía?”</em>. Cada reserva descuenta una entrada.
+    </p>`;
+  return shell("TU CÓDIGO HIGHER HEELS", inner);
+}
+
+export async function sendPurchaseEmail(to: string, b: PurchaseEmail): Promise<void> {
+  await send(to, `Tu código ${b.planLabel} · Higher Heels`, buildPurchaseEmailHtml(b));
+}

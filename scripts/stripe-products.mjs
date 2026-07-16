@@ -61,12 +61,18 @@ for (const p of PLANS) {
       (p.recurring ? pr.recurring?.interval === "month" : !pr.recurring)
   );
 
+  // lookup_key is a stable id that is the SAME in test and live, so the app
+  // never hardcodes price_... ids (they differ per mode).
+  const lookupKey = `hhs_${p.plan_id}`;
+
   if (!price) {
     price = await stripe.prices.create({
       product: product.id,
       unit_amount: p.amount,
       currency: "eur",
       ...(p.recurring ? { recurring: { interval: "month" } } : {}),
+      lookup_key: lookupKey,
+      transfer_lookup_key: true, // steal the key from an older price if needed
       metadata,
     });
     console.log(`+ created price    ${p.plan_id.padEnd(8)} ${price.id}  ${eur(p.amount)}${p.recurring ? "/mes" : ""}`);
@@ -75,11 +81,14 @@ for (const p of PLANS) {
       await stripe.prices.update(old.id, { active: false });
       console.log(`  - deactivated stale price ${old.id} (${eur(old.unit_amount)})`);
     }
+  } else if (price.lookup_key !== lookupKey) {
+    price = await stripe.prices.update(price.id, { lookup_key: lookupKey, transfer_lookup_key: true });
+    console.log(`~ tagged price     ${p.plan_id.padEnd(8)} ${price.id}  lookup_key=${lookupKey}`);
   } else {
     console.log(`= price exists     ${p.plan_id.padEnd(8)} ${price.id}  ${eur(p.amount)}${p.recurring ? "/mes" : ""}`);
   }
 
-  results.push({ plan: p.plan_id, kind: p.kind, entradas: p.entradas, amount: eur(p.amount), priceId: price.id });
+  results.push({ plan: p.plan_id, kind: p.kind, entradas: p.entradas, amount: eur(p.amount), lookup_key: price.lookup_key, priceId: price.id });
 }
 
 console.log("\n─── SUMMARY ───");

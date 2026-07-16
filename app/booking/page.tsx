@@ -181,6 +181,32 @@ export default function BookingPage() {
   const [planType, setPlanType] = useState<PlanType>("single");
   const [occupiedSlots, setOccupiedSlots] = useState<string[]>([]);
   const [timeArc, setTimeArc] = useState<string>("dia");
+  const [buying, setBuying] = useState<string | null>(null);
+  const [buyError, setBuyError] = useState<string | null>(null);
+
+  async function buyPlan(planId: string) {
+    setBuying(planId);
+    setBuyError(null);
+    try {
+      const res = await fetch("/api/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: planId }),
+      });
+      const data = await res.json();
+      if (res.status === 404) {
+        // Live prices not provisioned yet → graceful message, not an error.
+        setBuyError("La compra online estará disponible muy pronto.");
+        setBuying(null);
+        return;
+      }
+      if (!res.ok || !data.url) throw new Error(data.error ?? "Error");
+      window.location.href = data.url;
+    } catch {
+      setBuyError("No se pudo iniciar la compra. Inténtalo de nuevo.");
+      setBuying(null);
+    }
+  }
 
   // Fetch real availability from the DB whenever room + date change
   useEffect(() => {
@@ -381,23 +407,25 @@ export default function BookingPage() {
                     </p>
                     <div className="mt-auto">
                       <button
-                        disabled
-                        className="w-full h-12 rounded-sm text-sm cursor-not-allowed"
+                        onClick={() => buyPlan(p.id)}
+                        disabled={buying !== null}
+                        className="w-full h-12 rounded-sm text-sm text-white transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-50"
                         style={{
                           fontFamily: "var(--font-bebas-neue)",
                           letterSpacing: "0.12em",
-                          background: "rgba(255,255,255,0.06)",
-                          color: "rgba(245,245,245,0.4)",
+                          background: "#FF1E3C",
+                          boxShadow: "0 0 24px rgba(255,30,60,0.4)",
                         }}
                       >
-                        MUY PRONTO
+                        {buying === p.id ? "REDIRIGIENDO..." : "COMPRAR"}
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
+              {buyError && <p className="mt-4 text-red-400 text-sm">{buyError}</p>}
               <p className="mt-6 text-xs text-[#F5F5F5]/30 max-w-xl">
-                Al comprar recibirás un código único por email, válido para reservar todas tus entradas con el mismo código. La compra online estará disponible muy pronto.
+                Al comprar recibirás un código único por email, válido para reservar todas tus entradas con el mismo código.
               </p>
             </div>
           )}
