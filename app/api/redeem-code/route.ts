@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { getPinForHour } from "@/lib/pin";
-import { sendConfirmationEmail, sendAccessCodeEmail } from "@/lib/email";
+import { sendConfirmationEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -58,7 +57,6 @@ export async function POST(request: Request) {
 
   const naive = `${slotDate} ${time}:00`;
   const durHours = Number(duration) || 1;
-  const pin = getPinForHour(date ?? slotDate, time);
 
   try {
     // One atomic statement: decrement only if valid+has balance, then insert the
@@ -75,11 +73,11 @@ export async function POST(request: Request) {
         returning code, remaining_entries, customer_id, plan_name
       ), ins as (
         insert into bookings
-          (customer_id, room_id, slot_start, slot_end, source, plan_code, door_pin, status)
+          (customer_id, room_id, slot_start, slot_end, source, plan_code, status)
         select customer_id, ${room},
                (${naive})::timestamp at time zone 'Europe/Madrid',
                ((${naive})::timestamp at time zone 'Europe/Madrid') + (${durHours} || ' hours')::interval,
-               'code', code, ${pin}, 'confirmed'
+               'code', code, 'confirmed'
         from dec
         returning id, customer_id
       )
@@ -100,7 +98,8 @@ export async function POST(request: Request) {
       const cust = (await sql`select email from customers where id = ${customer_id}`) as { email: string }[];
       const email = cust[0]?.email;
       if (email) {
-        // 1) Confirmation email (no PIN) — shows the plan + remaining entries
+        // Confirmation email (no PIN) — shows the plan + remaining entries.
+        // The access code is emailed later by the Nuki cron.
         await sendConfirmationEmail(email, {
           room,
           date: date ?? slotDate,
@@ -109,17 +108,10 @@ export async function POST(request: Request) {
           paymentLabel: "Reservado con",
           paymentValue: `${plan_name} · te quedan ${remaining_entries} entradas`,
         });
-        // 2) Access-code email — TODO: move to the Nuki cron (~10 min before the slot)
-        await sendAccessCodeEmail(email, {
-          room,
-          date: date ?? slotDate,
-          time,
-          pin,
-        });
       }
     }
 
-    return NextResponse.json({ ok: true, remaining: remaining_entries, pin });
+    return NextResponse.json({ ok: true, remaining: remaining_entries });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("bookings_room_id_slot_start_key") || msg.includes("23505")) {

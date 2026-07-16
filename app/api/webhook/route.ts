@@ -2,8 +2,7 @@ import Stripe from "stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { getPinForHour } from "@/lib/pin";
-import { sendConfirmationEmail, sendAccessCodeEmail } from "@/lib/email";
+import { sendConfirmationEmail } from "@/lib/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -32,8 +31,6 @@ export async function POST(request: Request) {
   if (event.type === "payment_intent.succeeded") {
     const intent = event.data.object as Stripe.PaymentIntent;
 
-    const pin = getPinForHour(intent.metadata.date, intent.metadata.time);
-
     const booking = {
       id: intent.id,
       room: intent.metadata.room,
@@ -44,7 +41,7 @@ export async function POST(request: Request) {
       currency: intent.currency.toUpperCase(),
       customer_email: intent.receipt_email ?? "",
       confirmed_at: new Date().toISOString(),
-      pin,
+      pin: "", // filled by the Nuki cron ~3h before the session
     };
 
     // Save to the database (customer + booking) — powers real availability
@@ -66,13 +63,13 @@ export async function POST(request: Request) {
         const naive = `${slotDate} ${slotTime}:00`;
         await sql`
           insert into bookings
-            (customer_id, room_id, slot_start, slot_end, source, amount_paid, stripe_payment_intent, door_pin, status)
+            (customer_id, room_id, slot_start, slot_end, source, amount_paid, stripe_payment_intent, status)
           values (
             ${customerId},
             ${intent.metadata.room},
             (${naive})::timestamp at time zone 'Europe/Madrid',
             ((${naive})::timestamp at time zone 'Europe/Madrid') + (${durHours} || ' hours')::interval,
-            'single', ${intent.amount / 100}, ${intent.id}, ${pin}, 'confirmed'
+            'single', ${intent.amount / 100}, ${intent.id}, 'confirmed'
           )
           on conflict (room_id, slot_start) do nothing`;
       }
@@ -97,7 +94,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // 1) Confirmation email (no PIN)
+    // Confirmation email (no PIN — the access code is emailed by the Nuki cron
+    // a few hours before the session, once it exists on the lock).
     await sendConfirmationEmail(booking.customer_email, {
       room: booking.room,
       date: booking.date,
@@ -105,13 +103,6 @@ export async function POST(request: Request) {
       duration: booking.duration,
       paymentLabel: "Importe pagado",
       paymentValue: `${booking.amount}€`,
-    });
-    // 2) Access-code email — TODO: move to the Nuki cron (~10 min before the slot)
-    await sendAccessCodeEmail(booking.customer_email, {
-      room: booking.room,
-      date: booking.date,
-      time: booking.time,
-      pin: booking.pin,
     });
   }
 

@@ -754,7 +754,7 @@ export default function BookingPage() {
             <div className="flex items-start gap-2">
               <Lock size={13} className="flex-shrink-0 mt-0.5" style={{ color: "#FF1E3C" }} />
               <span>
-                Recibirás un <strong className="text-[#F5F5F5]/70">código PIN temporal</strong> en tu email 10 minutos antes de la sesión.
+                Recibirás un <strong className="text-[#F5F5F5]/70">código PIN temporal</strong> en tu email unas horas antes de la sesión.
                 El código activa la cerradura exactamente durante tu reserva y se desactiva automáticamente al finalizar.
                 Cancelación gratuita hasta 24h antes.
               </span>
@@ -891,7 +891,7 @@ export default function BookingPage() {
         ¡RESERVA CONFIRMADA!
       </h1>
       <p className="text-[#F5F5F5]/50 mb-10 max-w-md">
-        Hemos enviado la confirmación a tu email. Recibirás tu PIN de acceso 10 minutos antes de la sesión.
+        Hemos enviado la confirmación a tu email. Recibirás tu PIN de acceso unas horas antes de la sesión.
       </p>
 
       {/* Booking card */}
